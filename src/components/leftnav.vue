@@ -1,27 +1,28 @@
 /**
 * 左边菜单
-*/ 
+*/
 <template>
-  <el-menu default-active="2" :collapse="collapsed" collapse-transition router :default-active="$route.path" unique-opened class="el-menu-vertical-demo" background-color="#334157" text-color="#fff" active-text-color="#ffd04b">
+  <el-menu default-active="2" :collapse="collapsed" collapse-transition router :default-active="$route.path"
+           unique-opened class="el-menu-vertical-demo" background-color="#334157" text-color="#fff"
+           active-text-color="#ffd04b">
     <div class="logobox">
       <img class="logoimg" src="../assets/img/logo.png" alt="">
     </div>
     <el-submenu v-for="menu in allmenu" :key="menu.menuid" :index="menu.menuname">
       <template slot="title">
         <i class="iconfont" :class="menu.icon"></i>
-        <span>{{menu.menuname}}</span>
+        <span>{{ menu.menuname }}</span>
       </template>
       <el-menu-item-group>
         <el-menu-item v-for="chmenu in menu.menus" :index="'/'+chmenu.url" :key="chmenu.menuid">
           <i class="iconfont" :class="chmenu.icon"></i>
-          <span>{{chmenu.menuname}}</span>
+          <span>{{ chmenu.menuname }}</span>
         </el-menu-item>
       </el-menu-item-group>
     </el-submenu>
   </el-menu>
 </template>
 <script>
-import { menu } from '../api/userMG'
 export default {
   name: 'leftnav',
   data() {
@@ -38,130 +39,118 @@ export default {
       data: [
         {
           menuid: 1,
-          icon: 'li-icon-xiangmuguanli',
-          menuname: '基础管理',
+          icon: 'icon-renyuanguanli',
+          menuname: '人员管理',
           hasThird: null,
           url: null,
           menus: [
             {
               menuid: 2,
-              icon: 'icon-cat-skuQuery',
-              menuname: '商品管理',
+              icon: 'icon-yuangonggonghao',
+              menuname: '员工管理',
               hasThird: 'N',
-              url: 'goods/Goods',
+              url: 'person/employee',
+              menus: null
+            }, {
+              menuid: 3,
+              icon: 'icon-dailishang',
+              menuname: '代理管理',
+              hasThird: 'N',
+              url: 'person/agent',
+              menus: null
+            }, {
+              menuid: 4,
+              icon: 'icon-yonghu',
+              menuname: '用户管理',
+              hasThird: 'N',
+              url: 'person/user',
               menus: null
             }
           ]
         },
         {
           menuid: 33,
-          icon: 'li-icon-dingdanguanli',
-          menuname: '订单管理',
+          icon: 'icon-hanghanggonggao',
+          menuname: '航行管理',
           hasThird: null,
-          url: null,
+          url: '',
           menus: [
             {
               menuid: 34,
-              icon: 'icon-order-manage',
-              menuname: '交易订单',
+              icon: 'icon-hangxian',
+              menuname: '航线管理',
               hasThird: 'N',
-              url: 'pay/Order',
+              url: 'fly/airway',
+              menus: null
+            }, {
+              menuid: 35,
+              icon: 'icon-jichang',
+              menuname: '机场信息管理',
+              hasThird: 'N',
+              url: 'fly/airport',
+              menus: null
+            }, {
+              menuid: 36,
+              icon: 'icon-hangbandongtai',
+              menuname: '航班管理',
+              hasThird: 'N',
+              url: 'fly/flight',
               menus: null
             }
           ]
         },
         {
           menuid: 71,
-          icon: 'li-icon-xitongguanli',
-          menuname: '系统管理',
+          icon: 'icon-lvxing',
+          menuname: '飞机管理',
           hasThird: null,
           url: null,
           menus: [
             {
               menuid: 72,
-              icon: 'icon-cus-manage',
-              menuname: '用户管理',
+              icon: 'icon-feiji',
+              menuname: '飞机类型',
               hasThird: 'N',
-              url: 'system/user',
+              url: 'plane/planeType',
               menus: null
             },
             {
               menuid: 174,
-              icon: 'icon-cms-manage',
-              menuname: '菜单管理',
+              icon: 'icon-feiji1',
+              menuname: '飞机信息',
               hasThird: 'N',
-              url: 'system/Module',
-              menus: null
-            },
-            {
-              menuid: 73,
-              icon: 'icon-news-manage',
-              menuname: '角色管理',
-              hasThird: 'N',
-              url: 'system/Role',
-              menus: null
-            },
-            {
-              menuid: 74,
-              icon: 'icon-cs-manage',
-              menuname: '公司管理',
-              hasThird: 'N',
-              url: 'system/Dept',
-              menus: null
-            },
-            {
-              menuid: 75,
-              icon: 'icon-promotion-manage',
-              menuname: '系统环境变量',
-              hasThird: 'N',
-              url: 'system/Variable',
-              menus: null
-            },
-            {
-              menuid: 76,
-              icon: 'icon-cms-manage',
-              menuname: '权限管理',
-              hasThird: 'N',
-              url: 'system/Permission',
+              url: 'plane/planeMsg',
               menus: null
             }
           ]
         },
         {
           menuid: 128,
-          icon: 'li-icon-shangchengxitongtubiaozitihuayuanwenjian91',
-          menuname: '支付管理',
+          icon: 'icon-dingdan',
+          menuname: '订单管理',
           hasThird: null,
           url: null,
           menus: [
             {
               menuid: 129,
-              icon: 'icon-provider-manage',
-              menuname: '支付配置信息',
+              icon: 'icon-dingdan-',
+              menuname: '查看订单信息',
               hasThird: 'N',
-              url: 'machine/MachineConfig',
-              menus: null
-            },
-            {
-              menuid: 175,
-              icon: 'icon-provider-manage',
-              menuname: '支付配置',
-              hasThird: 'N',
-              url: 'pay/Config',
+              url: 'order/order',
               menus: null
             }
           ]
         },
         {
           menuid: 150,
-          icon: 'li-icon-shangchengxitongtubiaozitihuayuanwenjian91',
-          menuname: '图表',
+          icon: 'icon-tongji1',
+          menuname: '统计',
           hasThird: null,
           url: null,
           menus: [
             {
               menuid: 159,
-              icon: 'icon-provider-manage',
+              icon: 'icon-tongji',
               menuname: '数据可视化',
               hasThird: 'N',
               url: 'charts/statistics',
@@ -172,21 +161,8 @@ export default {
       ],
       msg: 'success'
     }
-          this.allmenu = res.data
-    
-    // menu(localStorage.getItem('logintoken'))
-    //   .then(res => {
-    //     console.log(JSON.stringify(res))
-    //     if (res.success) {
-    //       this.allmenu = res.data
-    //     } else {
-    //       this.$message.error(res.msg)
-    //       return false
-    //     }
-    //   })
-    //   .catch(err => {
-    //     this.$message.error('菜单加载失败，请稍后再试！')
-    //   })
+    this.allmenu = res.data
+
     // 监听
     this.$root.Bus.$on('toggle', value => {
       this.collapsed = !value
@@ -199,19 +175,24 @@ export default {
   width: 240px;
   min-height: 400px;
 }
+
 .el-menu-vertical-demo:not(.el-menu--collapse) {
   border: none;
   text-align: left;
 }
+
 .el-menu-item-group__title {
   padding: 0px;
 }
+
 .el-menu-bg {
   background-color: #1f2d3d !important;
 }
+
 .el-menu {
   border: none;
 }
+
 .logobox {
   height: 40px;
   line-height: 40px;
@@ -220,6 +201,7 @@ export default {
   text-align: center;
   padding: 20px 0px;
 }
+
 .logoimg {
   height: 40px;
 }
