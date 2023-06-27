@@ -54,26 +54,35 @@
       <el-table-column label="操作" min-width="300">
         <template slot-scope="scope">
           <el-button size="mini" @click="handleEdit(scope.row)">编辑</el-button>
-          <el-button size="mini" type="danger" @click="deleteEmployee(scope.$index, scope.row)">删除</el-button>
+          <el-button size="mini" type="danger" @click="deleteEmployee(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
     <!-- 编辑界面 -->
     <el-dialog :title="title" :visible.sync="editFormVisible" width="30%" @click='closeDialog("edit")'>
-      <el-form label-width="80px" ref="editForm" :model="editForm" :rules="rules">
+      <el-form label-width="80px" ref="editAdminForm" :model="editAdminForm" :rules="rules">
         <el-form-item label="用户名" prop="username">
-          <el-input size="small" v-model="editForm.userName" auto-complete="off" placeholder="请输入用户名"></el-input>
+          <el-input size="small" v-model="editAdminForm.username" auto-complete="off" placeholder="请输入用户名"></el-input>
         </el-form-item>
-        <el-form-item label="员工类型" prop="roleId">
-          <el-select size="small" v-model="editForm.roleId" placeholder="请选择" class="userRole">
+<!--        <el-form-item label="密码" prop="password">-->
+<!--          <el-input size="small"  v-model="editAdminForm.password" auto-complete="off" placeholder="请输入密码"></el-input>-->
+<!--        </el-form-item>-->
+        <el-form-item label="员工类型" prop="administratorType">
+          <el-select size="small" v-model="editAdminForm.administratorType" placeholder="请选择员工类型">
             <el-option label="系统管理员" value="1"></el-option>
             <el-option label="运维人员" value="2"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="帐号状态" prop="status">
+          <el-select size="small" v-model="editAdminForm.status" placeholder="请选择帐号状态">
+            <el-option label="正常" value="1"></el-option>
+            <el-option label="已锁定" value="0"></el-option>
           </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button size="small" @click='closeDialog("edit")'>取消</el-button>
-        <el-button size="small" type="primary" :loading="loading" class="title" @click="submitForm('editForm')">保存</el-button>
+        <el-button size="small" type="primary" :loading="loading" class="title" @click="submitForm('editAdminForm')">保存</el-button>
       </div>
     </el-dialog>
     <!--    分页条-->
@@ -98,9 +107,15 @@ export default {
   data(){
     /* 定义初始化变量 */
     return{
+      editAdminForm:{
+        username: '',
+        status: '',
+        administratorType: '',
+        // password: ''
+      },
       nshow: true, //switch开启
       fshow: false, //switch关闭
-      title: '添加用户',
+      title: '修改员工',
       editFormVisible: false,
       editForm: {
         id:'',
@@ -113,16 +128,73 @@ export default {
       },
       userData:[
 
-      ]
+      ],
+      rules:{
+        username:[
+          {required: true, message: '用户名不能为空', trigger: 'blur'}
+        ],
+        password:[
+          {required: true, message: '密码不能为空', trigger: 'blur'}
+        ],
+        status:[
+          {required: true, message: '请选择帐号状态', trigger: 'blur'}
+        ],
+        administratorType:[
+          {required: true, message: '请选择员工类型', trigger: 'blur'}
+        ]
+      },
+      ids:[]
     }
   },
   /* 定义事件函数 */
   methods:{
+    selectChange(val){
+      this.ids = []
+      val.forEach((item,index)=>{
+        this.ids.push(item.id)
+      })
+    },
+    deleteEmployee(row){
+      this.$confirm('确定要删除吗?', '信息', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        // 删除
+        this.$axios.delete("/delete?id=" + id).then =(res =>{
+          if(res.data.code === 200){
+            this.queryAll()
+            this.$message.success("修改成功")
+          } else {
+            this.$message.error(res.data.data)
+          }
+        }
+        )
+      })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除！'
+          })
+        })
+    },
+    submitForm(formName){
+      this.$axios.put("/admin/updateAdmin", this.editAdminForm).then(res => {
+        if(res.data.code === 200){
+          this.editFormVisible = false
+          this.queryAll()
+          this.$message.success("修改成功")
+        } else {
+          this.$message.error(res.data.data)
+        }
+      })
+    },
     closeDialog(){
       this.editFormVisible = false
     },
-    handleEdit(){
+    handleEdit(user){
       this.editFormVisible = true
+      this.editAdminForm = {...user}
     },
     editStatus(row) {
       this.editForm.id = row.id
