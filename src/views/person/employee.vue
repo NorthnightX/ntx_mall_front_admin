@@ -4,29 +4,42 @@
       <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>员工管理</el-breadcrumb-item>
     </el-breadcrumb>
-<!--条件查询-->
-    <el-form :inline="true" :model="formInline" class="user-search">
+    <!--条件查询-->
+    <el-form v-show="!showDeleteButton" :inline="true" :model="formInline" class="user-search">
       <el-form-item label="搜索：">
         <el-select size="small" v-model="formInline.status" placeholder="请选择帐号状态">
           <el-option label="全部" value=""></el-option>
           <el-option label="正常" value="1"></el-option>
-          <el-option label="已锁定" value="2"></el-option>
+          <el-option label="已锁定" value="0"></el-option>
         </el-select>
         <el-select size="small" v-model="formInline.administratorType" placeholder="请选择部门">
           <el-option label="全部" value=""></el-option>
           <el-option label="运维人员" value="2"></el-option>
           <el-option label="系统管理员" value="1"></el-option>
         </el-select>
-      </el-form-item>
-      <el-form-item label="">
-        <el-input size="small" v-model="formInline.username" placeholder="输入用户名"></el-input>
-      </el-form-item>
-      <el-form-item>
-        <el-button size="small" type="primary" icon="el-icon-search" @click="queryByName()">搜索</el-button>
+        <el-form-item label="">
+          <el-input size="small" v-model="formInline.username" placeholder="输入用户名"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button size="small" type="primary" icon="el-icon-search" @click="queryByName()">搜索</el-button>
+        </el-form-item>
       </el-form-item>
     </el-form>
-<!--列表-->
-    <el-table size="small" @selection-change="selectChange" :data="userData" highlight-current-row v-loading="loading" border element-loading-text="拼命加载中" style="width: 100%;">
+    <!--列表删除-->
+    <el-form v-show="showDeleteButton" :inline="true" :model="formInline" class="user-search">
+      <el-form-item>
+        <el-button size="small" type="primary" icon="el-icon-close" @click="closeDeleteButton()">取消</el-button>
+      </el-form-item>
+      <el-form-item>
+        <el-button size="small" type="danger" icon="el-icon-delete" style="margin-left: 1000px"
+                   @click="deleteList(ids)">删除
+        </el-button>
+      </el-form-item>
+    </el-form>
+
+    <!--列表-->
+    <el-table size="small" @selection-change="selectChange" :data="userData" highlight-current-row v-loading="loading"
+              border element-loading-text="拼命加载中" style="width: 100%;">
       <el-table-column align="center" type="selection" width="50">
       </el-table-column>
       <el-table-column align="center" sortable prop="username" label="用户名" width="120">
@@ -36,24 +49,26 @@
       <el-table-column align="center" sortable prop="password" label="密码" width="260">
       </el-table-column>
       <el-table-column align="center"
-        label="员工类型">
+                       label="员工类型">
         <template slot-scope="scope">
           <div>
             {{
-                parseInt(scope.row.administratorType) === 1 ? '系统管理员' : '运维人员'
+              parseInt(scope.row.administratorType) === 1 ? '系统管理员' : '运维人员'
             }}
           </div>
         </template>
       </el-table-column>
       <el-table-column align="center" sortable prop="status" label="状态" min-width="150">
         <template slot-scope="scope">
-          <el-switch v-model="scope.row.status === '1' ? nshow : fshow" active-color="#13ce66" inactive-color="#ff4949" @change="editStatus(scope.row)">
+          <el-switch v-model="scope.row.status === '1' ? nshow : fshow" active-color="#13ce66" inactive-color="#ff4949"
+                     @change="editStatus(scope.row)">
           </el-switch>
         </template>
       </el-table-column>
       <el-table-column label="操作" min-width="300">
         <template slot-scope="scope">
           <el-button size="mini" @click="handleEdit(scope.row)">编辑</el-button>
+          <el-button size="mini" type="success" @click="resetpwd(scope.row.id)">重置密码</el-button>
           <el-button size="mini" type="danger" @click="deleteEmployee(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
@@ -62,11 +77,9 @@
     <el-dialog :title="title" :visible.sync="editFormVisible" width="30%" @click='closeDialog("edit")'>
       <el-form label-width="80px" ref="editAdminForm" :model="editAdminForm" :rules="rules">
         <el-form-item label="用户名" prop="username">
-          <el-input size="small" v-model="editAdminForm.username" auto-complete="off" placeholder="请输入用户名"></el-input>
+          <el-input size="small" v-model="editAdminForm.username" auto-complete="off"
+                    placeholder="请输入用户名"></el-input>
         </el-form-item>
-<!--        <el-form-item label="密码" prop="password">-->
-<!--          <el-input size="small"  v-model="editAdminForm.password" auto-complete="off" placeholder="请输入密码"></el-input>-->
-<!--        </el-form-item>-->
         <el-form-item label="员工类型" prop="administratorType">
           <el-select size="small" v-model="editAdminForm.administratorType" placeholder="请选择员工类型">
             <el-option label="系统管理员" value="1"></el-option>
@@ -82,7 +95,9 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button size="small" @click='closeDialog("edit")'>取消</el-button>
-        <el-button size="small" type="primary" :loading="loading" class="title" @click="submitForm('editAdminForm')">保存</el-button>
+        <el-button size="small" type="primary" :loading="loading" class="title" @click="submitForm('editAdminForm')">
+          保存
+        </el-button>
       </div>
     </el-dialog>
     <!--    分页条-->
@@ -104,21 +119,28 @@ import {userDelete, userLock} from "../../api/userMG";
 
 export default {
   name: "employee",
-  data(){
+  data() {
+
     /* 定义初始化变量 */
-    return{
-      editAdminForm:{
+    return {
+      showDeleteButton: false,
+      topFormVisible: true,
+      topFormDeleteVisible: false,
+      editAdminForm: {
         username: '',
         status: '',
         administratorType: '',
         // password: ''
       },
+      pageNum: 1,
+      pageSize: 10,
+      total: 0,
       nshow: true, //switch开启
       fshow: false, //switch关闭
       title: '修改员工',
       editFormVisible: false,
       editForm: {
-        id:'',
+        id: '',
         status: '',
       },
       formInline: {
@@ -126,50 +148,45 @@ export default {
         status: '',
         administratorType: ''
       },
-      userData:[
-
-      ],
-      rules:{
-        username:[
+      userData: [],
+      rules: {
+        username: [
           {required: true, message: '用户名不能为空', trigger: 'blur'}
         ],
-        password:[
+        password: [
           {required: true, message: '密码不能为空', trigger: 'blur'}
         ],
-        status:[
+        status: [
           {required: true, message: '请选择帐号状态', trigger: 'blur'}
         ],
-        administratorType:[
+        administratorType: [
           {required: true, message: '请选择员工类型', trigger: 'blur'}
         ]
       },
-      ids:[]
+      ids: []
     }
   },
   /* 定义事件函数 */
-  methods:{
-    selectChange(val){
-      this.ids = []
-      val.forEach((item,index)=>{
-        this.ids.push(item.id)
-      })
-    },
-    deleteEmployee(row){
+  methods: {
+    deleteList(ids) {
       this.$confirm('确定要删除吗?', '信息', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        // 删除
-        this.$axios.delete("/delete?id=" + id).then =(res =>{
-          if(res.data.code === 200){
+        const params = {
+          id: ids.join(',')
+        };
+        this.$axios.delete("/admin/delete", {params}).then(res => {
+          if (res.data.code === 200) {
+            this.pageNum = 1
+            this.pageSize = 10
             this.queryAll()
-            this.$message.success("修改成功")
+            this.$message.success("重置成功")
           } else {
             this.$message.error(res.data.data)
           }
-        }
-        )
+        })
       })
         .catch(() => {
           this.$message({
@@ -178,9 +195,82 @@ export default {
           })
         })
     },
-    submitForm(formName){
+    closeDeleteButton() {
+      this.ids = []
+      this.showDeleteButton = false
+      this.queryAll()
+
+    },
+    handleSizeChange(val) {
+      this.pageSize = val
+      this.queryAll();
+    },
+    handleCurrentChange(val) {
+      this.pageNum = val
+      this.queryAll()
+    },
+    selectChange(val) {
+      this.ids = []
+      val.forEach((item, index) => {
+        this.ids.push(item.id)
+      })
+      if (this.ids.length > 0) {
+        this.showDeleteButton = true
+      } else {
+        this.showDeleteButton = false
+      }
+    },
+    resetpwd(id) {
+      this.$confirm('确定要重置吗?', '信息', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        // 删除
+        this.$axios.put("/admin/updatePassword?id=" + id).then(res => {
+          if (res.data.code === 200) {
+            this.queryAll()
+            this.$message.success("重置成功")
+          } else {
+            this.$message.error(res.data.data)
+          }
+        })
+      })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除！'
+          })
+        })
+    },
+    deleteEmployee(id) {
+      this.$confirm('确定要删除吗?', '信息', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        // 删除
+        this.$axios.delete("/admin/delete?id=" + id).then(res => {
+          if (res.data.code === 200) {
+            this.pageNum = 1
+            this.pageSize = 10
+            this.queryAll()
+            this.$message.success("删除成功")
+          } else {
+            this.$message.error(res.data.data)
+          }
+        })
+      })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除！'
+          })
+        })
+    },
+    submitForm(formName) {
       this.$axios.put("/admin/updateAdmin", this.editAdminForm).then(res => {
-        if(res.data.code === 200){
+        if (res.data.code === 200) {
           this.editFormVisible = false
           this.queryAll()
           this.$message.success("修改成功")
@@ -189,10 +279,10 @@ export default {
         }
       })
     },
-    closeDialog(){
+    closeDialog() {
       this.editFormVisible = false
     },
-    handleEdit(user){
+    handleEdit(user) {
       this.editFormVisible = true
       this.editAdminForm = {...user}
     },
