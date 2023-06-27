@@ -226,7 +226,6 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        // 删除
         this.$axios.put("/admin/updatePassword?id=" + id).then(res => {
           if (res.data.code === 200) {
             this.queryAll()
@@ -282,9 +281,9 @@ export default {
     closeDialog() {
       this.editFormVisible = false
     },
-    handleEdit(user) {
+    handleEdit(employee) {
       this.editFormVisible = true
-      this.editAdminForm = {...user}
+      this.editAdminForm = {...employee}
     },
     editStatus(row) {
       this.editForm.id = row.id
