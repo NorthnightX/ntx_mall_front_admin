@@ -23,6 +23,9 @@
         <el-form-item>
           <el-button size="small" type="primary" icon="el-icon-search" @click="queryByName()">搜索</el-button>
         </el-form-item>
+        <el-form-item>
+          <el-button size="small" type="primary" icon="el-icon-circle-plus" @click="addAdmin()">添加员工</el-button>
+        </el-form-item>
       </el-form-item>
     </el-form>
     <!--列表删除-->
@@ -100,6 +103,27 @@
         </el-button>
       </div>
     </el-dialog>
+    <!--    新增管理员-->
+    <el-dialog :title="title1" :visible.sync="addFormVisible" width="30%" @click='closeDialog("edit")'>
+      <el-form label-width="80px" ref="editAddAdminForm" :model="editAddAdminForm" :rules="rulesAdd">
+        <el-form-item label="用户名" prop="username">
+          <el-input size="small" v-model="editAddAdminForm.username" auto-complete="off" placeholder="请输入用户名"></el-input>
+        </el-form-item>
+        <el-form-item label="账号" prop="account">
+          <el-input size="small" v-model="editAddAdminForm.account" auto-complete="off" placeholder="请输入账号"></el-input>
+        </el-form-item>
+        <el-form-item label="帐号状态" prop="administratorType">
+          <el-select size="small" v-model="editAddAdminForm.administratorType" placeholder="请选择员工类型">
+            <el-option label="系统管理员" value="1"></el-option>
+            <el-option label="运维" value="2"></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button size="small" @click='closeDialog("edit")'>取消</el-button>
+        <el-button size="small" type="primary" :loading="loading" class="title" @click="submitAddForm('editAddAdminForm')">保存</el-button>
+      </div>
+    </el-dialog>
     <!--    分页条-->
     <div class="pagination">
       <el-pagination
@@ -123,6 +147,8 @@ export default {
 
     /* 定义初始化变量 */
     return {
+      title1: "新增员工",
+      addFormVisible: false,
       showDeleteButton: false,
       topFormVisible: true,
       topFormDeleteVisible: false,
@@ -148,7 +174,23 @@ export default {
         status: '',
         administratorType: ''
       },
+      editAddAdminForm:{
+        username:'',
+        administratorType:'',
+        account:''
+      },
       userData: [],
+      rulesAdd:{
+        username: [
+          {required: true, message: '用户名不能为空', trigger: 'blur'}
+        ],
+        account: [
+          {required: true, message: '账号不能为空', trigger: 'blur'}
+        ],
+        administratorType: [
+          {required: true, message: '员工类型不能为空', trigger: 'blur'}
+        ],
+      },
       rules: {
         username: [
           {required: true, message: '用户名不能为空', trigger: 'blur'}
@@ -168,6 +210,20 @@ export default {
   },
   /* 定义事件函数 */
   methods: {
+    submitAddForm(formName){
+      this.$axios.post("/admin/addAdministrator", this.editAddAdminForm).then(res => {
+        if (res.data.code === 200) {
+          this.addFormVisible = false
+          this.queryAll()
+          this.$message.success("新增成功")
+        } else {
+          this.$message.error(res.data.data)
+        }
+      })
+    },
+    addAdmin(){
+      this.addFormVisible = true
+    },
     deleteList(ids) {
       this.$confirm('确定要删除吗?', '信息', {
         confirmButtonText: '确定',
@@ -280,6 +336,7 @@ export default {
     },
     closeDialog() {
       this.editFormVisible = false
+      this.addFormVisible = false
     },
     handleEdit(employee) {
       this.editFormVisible = true
@@ -288,7 +345,7 @@ export default {
     editStatus(row) {
       this.editForm.id = row.id
       let status = row.status
-      if (status == '1') {
+      if (status === '1') {
         this.editForm.status = '0'
       } else {
         this.editForm.status = '1'

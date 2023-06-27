@@ -27,12 +27,14 @@ export default {
   },
   // 创建完毕状态(里面是操作)
   created() {
-    let user = JSON.parse(sessionStorage.getItem('user') || '{}')
-    if(user  != null){
-      this.user = user
-    }
+    this.getAdmin()
   },
   methods: {
+    getAdmin(){
+      this.$axios.get("/admin/getMe").then(res => {
+          this.user = res.data.data
+      })
+    },
     // 退出登录
     exit() {
       this.$confirm('退出登录, 是否继续?', '提示', {
@@ -42,7 +44,7 @@ export default {
       })
         .then(() => {
           setTimeout(() => {
-            sessionStorage.removeItem('user')
+            sessionStorage.removeItem('token')
             this.$router.push({ path: '/login' })
             this.$message({
               type: 'success',

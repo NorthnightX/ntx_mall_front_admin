@@ -4,27 +4,188 @@
       <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>航线管理</el-breadcrumb-item>
     </el-breadcrumb>
+
+    <!--条件查询-->
+    <el-form :inline="true" :model="formInline" class="user-search">
+      <el-form-item label="搜索：">
+        <el-select size="small" v-model="formInline.departureAirport" filterable clearable placeholder="请选择起始机场">
+          <el-option
+            v-for="item in airportOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
+
+        <el-select size="small" v-model="formInline.destinationAirport" filterable clearable placeholder="请选择目的机场">
+          <el-option
+            v-for="item in airportOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-button size="small" type="primary" icon="el-icon-search" @click="search">搜索</el-button>
+      </el-form-item>
+    </el-form>
+
+    <!--列表-->
+    <el-table size="small" @selection-change="selectChange" :data="listData" highlight-current-row v-loading="loading" border element-loading-text="拼命加载中" style="width: 100%;">
+      <el-table-column align="center" type="selection" width="50">
+      </el-table-column>
+      <el-table-column align="center" sortable prop="departureAirport" label="起始机场" width="120">
+      </el-table-column>
+      <el-table-column align="center" sortable prop="destinationAirport" label="目的机场" width="120">
+      </el-table-column>
+      <el-table-column align="center" sortable prop="publishTime " label="发布时间" width="150">
+      </el-table-column>
+      <el-table-column align="center" sortable prop="modifyTime " label="修改时间" width="150">
+      </el-table-column>
+      <el-table-column align="center" sortable prop="creator" label="创建人" width="100">
+      </el-table-column>
+      <el-table-column align="center" sortable prop="modifier" label="修改人" width="100">
+      </el-table-column>
+
+      <el-table-column label="操作" min-width="150">
+        <template slot-scope="scope">
+          <el-button size="mini" @click="handleEdit(scope.row)">编辑</el-button>
+          <el-button size="mini" type="danger" @click="deleteAriway(scope.row.id)">删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+
+    <!-- 编辑界面 -->
+    <el-dialog :title="title" :visible.sync="editFormVisible" width="30%" @click='closeDialog("edit")'>
+      <el-form label-width="80px" ref="editForm" :model="editForm" :rules="rules">
+        <el-form-item label="起始机场" prop="username">
+          <el-select size="small" v-model="editForm.departureAirport" filterable clearable placeholder="请选择起始机场">
+            <el-option
+              v-for="item in airportOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="目的机场" prop="password">
+          <el-select size="small" v-model="editForm.destinationAirport" filterable clearable placeholder="请选择目的机场">
+            <el-option
+              v-for="item in airportOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button size="small" @click='closeDialog("edit")'>取消</el-button>
+        <el-button size="small" type="primary" :loading="loading" class="title" @click="submitForm('editForm')">保存</el-button>
+      </div>
+    </el-dialog>
+
+    <!--    分页条-->
+    <div class="pagination">
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="pageNum"
+        :page-sizes="[10, 15, 20, 25]"
+        :page-size="pageSize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total">
+      </el-pagination>
+    </div>
   </div>
 </template>
 
 <script>
 export default {
   name: "airway",
-  data(){
+  data() {
     /* 定义初始化变量 */
-    return{
-
+    return {
+      // 基本信息
+      loading: false, //显示加载
+      editFormVisible: false,
+      // 修改信息
+      editForm: {
+        departureAirport: '',
+        destinationAirport: '',
+        userName: '',
+      },
+      // 列表信息
+      listData: [],
+      // 条件查找
+      formInline: {
+        departureAirport: '',
+        destinationAirport: ''
+      },
+      // 机场选线
+      airportOptions: []
     }
-  },
-  /* 定义事件函数 */
-  methods:{
-
   },
   /* vue的生命周期函数
      当页面加载完毕就会执行created里面的函数
   */
   created() {
+    this.getdata()
+  },
+  /* 定义事件函数 */
+  methods: {
+    submitForm(){
 
+    },
+    // 打开编辑窗口
+    handleEdit(airway) {
+      this.editFormVisible = true
+      this.editAirwayForm = {...airway}
+    },
+    // 编辑窗口关闭
+    closeDialog() {
+      this.editFormVisible = false
+    },
+    // 多选
+    selectChange(val){
+      this.ids = []
+      val.forEach((item,index)=>{
+        this.ids.push(item.id)
+      })
+    },
+    // 删除
+    deleteAriway(id){
+      this.$confirm('确定要删除吗?', '信息', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        // 删除
+        this.$axios.delete("/airway/delete?id=" + id).then(res =>{
+          if(res.data.code === 200){
+            this.queryAll()
+            this.$message.success("删除成功")
+          } else {
+            this.$message.error(res.data.data)
+          }
+        })
+      })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除！'
+          })
+        })
+    },
+    // 获取初始化信息
+    getdata() {
+
+    },
+    // 搜索事件
+    search() {
+      this.getdata(this.formInline)
+    }
   }
 }
 </script>

@@ -82,7 +82,7 @@ router.beforeEach((to, from, next) => {
   if (to.path === '/' || to.path === '/reg') {
     return next()
   } else {
-    let user = sessionStorage.getItem('user')
+    let user = sessionStorage.getItem('token')
     if (user != null) {
       //校验token
       return next()

@@ -64,7 +64,7 @@ export default {
           this.$axios.post('/admin/login',this.loginForm).then(res =>{
             if(res.data.code === 200){
               this.$message.success("登陆成功")
-              sessionStorage.setItem('user', JSON.stringify(res.data.data))
+              sessionStorage.setItem('token', res.data.data)
               this.$router.push('/charts/statistics')
             }else {
               this.$message.error(res.data.data)

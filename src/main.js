@@ -28,6 +28,18 @@ Vue.use(ElementUI);
 // 过滤器
 import * as custom from './utils/util'
 
+let token = sessionStorage.getItem("token");
+axios.interceptors.request.use(
+  config => {
+    if(token) config.headers['authorization'] = token
+    return config
+  },
+  error => {
+    console.log(error)
+    return Promise.reject(error)
+  }
+)
+
 Object.keys(custom).forEach(key => {
     Vue.filter(key, custom[key])
 })
