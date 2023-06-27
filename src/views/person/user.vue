@@ -111,6 +111,14 @@ export default {
   data(){
     /* 定义初始化变量 */
     return{
+      nshow: true, //switch开启
+      fshow: false, //switch关闭
+      title: '添加用户',
+      editFormVisible: false,
+      editForm: {
+        id:'',
+        status: '',
+      },
       formInline: {
         page: 1,
         limit: 10,
