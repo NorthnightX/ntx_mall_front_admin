@@ -147,8 +147,6 @@ export default {
       pageSize: 10,
       total: 0,
       airportData: [],
-      nshow: true, //switch开启
-      fshow: false, //switch关闭
       title: '机场修改',
       title1: '新增机场',
       editFormVisible: false,

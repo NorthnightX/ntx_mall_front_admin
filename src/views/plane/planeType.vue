@@ -120,13 +120,6 @@ export default {
   data(){
     /* 定义初始化变量 */
     return{
-      editAddAirportForm:{
-        province: '',
-        city: '',
-        airportName: '',
-        airportCoordinateX: '',
-        airportCoordinateY: ''
-      },
       addFormVisible: false,
       pageNum: 1,
       pageSize: 10,
