@@ -23,7 +23,6 @@
         </el-form-item>
         <el-form-item>
           <el-button class="loginButton" type="primary" @click="login('loginForm')">登录</el-button>
-          <el-button type="text" class="regButton" @click="toReg()">注册</el-button>
         </el-form-item>
       </el-form>
     </el-card>
