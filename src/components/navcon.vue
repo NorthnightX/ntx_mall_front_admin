@@ -31,7 +31,7 @@ export default {
   },
   methods: {
     getAdmin(){
-      this.$axios.get("/admin/getMe").then(res => {
+      this.$axios.post("/admin/getMe").then(res => {
           this.user = res.data.data
       })
     },
@@ -43,20 +43,16 @@ export default {
         type: 'warning'
       })
         .then(() => {
-          setTimeout(() => {
-            sessionStorage.removeItem('token')
-            this.$router.push({ path: '/login' })
-            this.$message({
-              type: 'success',
-              message: '已退出登录!'
+            this.$axios.get("/admin/logout").then(res =>{
+              if(res.data.code === 200){
+                sessionStorage.removeItem('token')
+                this.$router.push({ path: '/login' })
+                this.$message({
+                  type: 'success',
+                  message: '已退出登录!'
+                })
+              }
             })
-          }, 1000)
-        })
-        .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消'
-          })
         })
     },
     // 切换显示

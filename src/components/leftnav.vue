@@ -134,9 +134,34 @@ export default {
             {
               menuid: 129,
               icon: 'icon-dingdan-',
-              menuname: '查看订单信息',
+              menuname: '订单管理',
               hasThird: 'N',
               url: 'order/order',
+              menus: null
+            },
+            {
+              menuid: 130,
+              icon: 'icon-tuoyun',
+              menuname: '托运订单管理',
+              hasThird: 'N',
+              url: 'baggage/baggage',
+              menus: null
+            }
+          ]
+        },
+        {
+          menuid: 140,
+          icon: 'icon-gonggao1',
+          menuname: '公告管理',
+          hasThird: null,
+          url: null,
+          menus: [
+            {
+              menuid: 141,
+              icon: 'icon-gonggao',
+              menuname: '公告管理',
+              hasThird: 'N',
+              url: 'announcement/announcement',
               menus: null
             }
           ]

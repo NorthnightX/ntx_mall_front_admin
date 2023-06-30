@@ -139,7 +139,6 @@
   </div>
 </template>
 <script>
-import {userDelete, userLock} from "../../api/userMG";
 
 export default {
   name: "employee",

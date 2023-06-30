@@ -85,7 +85,7 @@
       <el-table-column label="操作" min-width="150">
         <template slot-scope="scope">
           <el-button size="mini" @click="handleEdit(scope.row)">编辑</el-button>
-          <el-button size="mini" type="danger" @click="deleteFlight(scope.row.id)">删除</el-button>
+          <el-button size="mini" type="danger" @click="deleteFlight(scope.row.flightId)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -93,9 +93,19 @@
     <el-dialog :title="title" :visible.sync="editFormVisible" width="50%" @click='closeDialog("edit")'>
       <el-form label-width="140px" ref="editFlightForm" :model="editFlightForm" :rules="rules">
         <el-form-item label="起始机场" prop="departureAirportId">
-          <el-select size="small" v-model="editFlightForm.departureAirportId" filterable clearable placeholder="请选择起始机场">
+          <el-select size="small" @change='queryByStartAirport(editFlightForm.departureAirportId)' v-model="editFlightForm.departureAirportId" filterable clearable placeholder="请选择起始机场">
             <el-option
               v-for="item in city"
+              :key="item.id"
+              :label="item.airportName"
+              :value="item.id">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="目的机场" prop="destinationAirport">
+          <el-select size="small" v-model="editFlightForm.destinationAirportId"  :disabled = disabled filterable clearable placeholder="请选择起始机场">
+            <el-option
+              v-for="item in startRoute"
               :key="item.id"
               :label="item.airportName"
               :value="item.id">
@@ -144,22 +154,22 @@
         </el-form-item>
         <el-form-item label="航班状态" prop="status">
           <el-select size="small" v-model="editFlightForm.status" placeholder="请选择" class="userRole">
-            <el-option label="完成" value="1"></el-option>
-            <el-option label="未起飞" value="0"></el-option>
-            <el-option label="推迟" value="2"></el-option>
+            <el-option label="完成" :value="1"></el-option>
+            <el-option label="未起飞" :value="0"></el-option>
+            <el-option label="推迟" :value="2"></el-option>
           </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button size="small" @click='closeDialog("edit")'>取消</el-button>
-        <el-button size="small" type="primary" :loading="loading" class="title" @click="submitForm('editForm')">保存</el-button>
+        <el-button size="small" type="primary" :loading="loading" class="title" @click="submitForm('editFlightForm')">保存</el-button>
       </div>
     </el-dialog>
     <!--    新增航线-->
-    <el-dialog :title="title1" :visible.sync="addFormVisible" width="30%" @click='closeDialog("edit")'>
-      <el-form label-width="80px" ref="editAddFlightForm" :model="editAddFlightForm" :rules="rules">
+    <el-dialog :title="title" :visible.sync="addFormVisible" width="50%" @click='closeDialog("edit")'>
+      <el-form label-width="140px" ref="editFlightForm" :model="editAddFlightForm" :rules="rules">
         <el-form-item label="起始机场" prop="departureAirportId">
-          <el-select size="small" v-model="editAddFlightForm.departureAirportId" filterable clearable placeholder="请选择起始机场">
+          <el-select size="small" @change='queryByStartAirport($event)' v-model="editAddFlightForm.departureAirportId" filterable clearable placeholder="请选择起始机场">
             <el-option
               v-for="item in city"
               :key="item.id"
@@ -168,20 +178,60 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="目的机场" prop="destinationAirportId">
-          <el-select size="small" v-model="editAddFlightForm.destinationAirportId" filterable clearable placeholder="请选择目的机场">
+        <el-form-item label="目的机场" prop="destinationAirport">
+          <el-select size="small" v-model="editAddFlightForm.destinationAirportId"  :disabled = disabled filterable clearable placeholder="请选择起始机场">
             <el-option
-              v-for="item in city"
+              v-for="item in startRoute"
               :key="item.id"
               :label="item.airportName"
               :value="item.id">
             </el-option>
           </el-select>
+        </el-form-item>
+        <el-form-item label="经济舱剩余座位数量" prop="economyClassNum">
+          <el-input size="small" v-model="editAddFlightForm.economyClassNum" auto-complete="off" placeholder="请输入经济舱座位数"></el-input>
+        </el-form-item>
+        <el-form-item label="头等舱剩余座位数量" prop="firstClassNum">
+          <el-input size="small" v-model="editAddFlightForm.firstClassNum" auto-complete="off"
+                    placeholder="请输入头等舱座位数"></el-input>
+        </el-form-item>
+        <el-form-item label="头等舱价格" prop="firstClassPrice">
+          <el-input size="small" v-model="editAddFlightForm.firstClassPrice" auto-complete="off" placeholder="请输入头等舱座位数"></el-input>
+        </el-form-item>
+        <el-form-item label="经济舱价格" prop="economyClassPrice">
+          <el-input size="small" v-model="editAddFlightForm.economyClassPrice" auto-complete="off"
+                    placeholder="请输入经济舱座位数"></el-input>
+        </el-form-item>
+        <el-form-item label="飞机编号" prop="aircraftId">
+          <el-select size="small" v-model="editAddFlightForm.aircraftId" filterable clearable placeholder="请选择飞机类型">
+            <el-option
+              v-for="item in plane"
+              :key="item.id"
+              :label="item.aircraftCode"
+              :value="item.id">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="离开时间" prop="departureTime">
+          <el-date-picker
+            v-model="editAddFlightForm.departureTime"
+            type="datetime"
+            value-format="yyyy-MM-dd HH:mm:ss"
+            placeholder="选择日期">
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item label="到达时间" prop="arrivalTime">
+          <el-date-picker
+            v-model="editAddFlightForm.arrivalTime"
+            type="datetime"
+            value-format="yyyy-MM-dd HH:mm:ss"
+            placeholder="选择日期">
+          </el-date-picker>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button size="small" @click='closeDialog("edit")'>取消</el-button>
-        <el-button size="small" type="primary" :loading="loading" class="title" @click="submitAddForm('editAddRouteForm')">保存</el-button>
+        <el-button size="small" type="primary" :loading="loading" class="title" @click="submitAddForm('editAddFlightForm')">保存</el-button>
       </div>
     </el-dialog>
     <!--    分页条-->
@@ -207,8 +257,17 @@ export default {
     return{
       // 基本信息
       editAddFlightForm:{
-
+        departureAirportId : '',
+        aircraftId: '',
+        departureTime:'',
+        arrivalTime:'',
+        economyClassNum:'',
+        firstClassNum:'',
+        firstClassPrice:'',
+        economyClassPrice:'',
+        destinationAirportId:''
       },
+      disabled : true,
       title1:"新增航班",
       title: "修改航班",
       loading: false, //显示加载
@@ -226,46 +285,93 @@ export default {
         aircraftCode:'',
         departureTime:''
       },
-      editFlightForm(){
-
+      editFlightForm:{
+        departureAirportId : '',
+          aircraftId: '',
+          departureTime:'',
+          arrivalTime:'',
+          status:'',
+          economyClassNum:'',
+          firstClassNum:'',
+          firstClassPrice:'',
+          economyClassPrice:'',
+          destinationAirportId:''
       },
       rules: {
         departureAirportId: [
-          {required: true, message: '请选择起始地点', trigger: 'blur'}
+          {required: true, message: '该项不能为空', trigger: 'blur'}
+        ],
+        aircraftId: [
+          {required: true, message: '该项不能为空', trigger: 'blur'}
+        ],
+        departureTime: [
+          {required: true, message: '该项不能为空', trigger: 'blur'}
+        ],
+        arrivalTime: [
+          {required: true, message: '该项不能为空', trigger: 'blur'}
+        ],
+        status: [
+          {required: true, message: '该项不能为空', trigger: 'blur'}
+        ],
+        economyClassNum: [
+          {required: true, message: '该项不能为空', trigger: 'blur'}
+        ],
+        firstClassNum: [
+          {required: true, message: '该项不能为空', trigger: 'blur'}
+        ],
+        firstClassPrice: [
+          {required: true, message: '该项不能为空', trigger: 'blur'}
+        ],
+        economyClassPrice: [
+          {required: true, message: '该项不能为空', trigger: 'blur'}
         ],
         destinationAirportId: [
-          {required: true, message: '请选择终止地点', trigger: 'blur'}
+          {required: true, message: '该项不能为空', trigger: 'blur'}
         ]
       },
       city:[],
-      plane:[]
+      plane:[],
+      startRoute:[]
     }
   },
   /* 定义事件函数 */
   methods:{
+    addFlight(){
+      this.addFormVisible = true
+      this.queryAllCity()
+      this.queryPlaneMsg()
+    },
+    queryByStartAirport(id){
+      this.$axios.get('/route/getByStartAirport?id=' + id).then(res => {
+        this.startRoute = res.data.data
+        this.disabled = false
+      })
+    },
     submitForm(formName) {
       this.$axios.put("/flight/updateFlight", this.editFlightForm).then(res => {
         if (res.data.code === 200) {
           this.editFormVisible = false
           this.queryAll()
+          this.queryAllCity()
           this.$message.success("修改成功")
         } else {
           this.$message.error(res.data.data)
         }
       })
     },
-    deleteFlight(id){
+    deleteFlight(flightId){
       this.$confirm('确定要删除吗?', '信息', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
         // 删除
-        this.$axios.delete("/flight/delete?id=" + id).then(res =>{
+        this.$axios.delete("/flight/delete?id=" + flightId).then(res =>{
           if(res.data.code === 200){
             this.pageNum = 1
             this.pageSize = 10
             this.queryAll()
+            this.queryAllCity()
             this.$message.success("删除成功")
           } else {
             this.$message.error(res.data.data)
@@ -280,32 +386,34 @@ export default {
         })
     },
     submitAddForm(formName){
-      this.$axios.post("/airport/addAirport", this.editAddFlightForm).then(res => {
+      this.$axios.post("/flight/addFlight", this.editAddFlightForm).then(res => {
         if (res.data.code === 200) {
           this.addFormVisible = false
           this.queryAll()
+          this.queryAllCity()
           this.$message.success("新增成功")
         } else {
           this.$message.error(res.data.data)
         }
       })
     },
-    addAirport(){
-      this.addFormVisible = true
-    },
     handleSizeChange(val) {
       this.pageSize = val
       this.queryAll();
+      this.queryAllCity()
     },
     handleCurrentChange(val) {
       this.pageNum = val
       this.queryAll()
+      this.queryAllCity()
     },
     // 打开编辑窗口
     handleEdit(flight) {
       this.editFormVisible = true
       this.editFlightForm = {...flight}
+      this.queryAllCity()
       this.queryPlaneMsg()
+      this.disabled = true
     },
     queryPlaneMsg(){
       this.$axios.get('/aircraftInformation/getAllPlane').then(res => {
@@ -316,13 +424,16 @@ export default {
     closeDialog() {
       this.editFormVisible = false
       this.addFormVisible = false
-    },    search(){
+    },
+    search(){
       this.pageNum = 1
       this.queryAll()
+      this.queryAllCity()
     },
     queryAllCity(){
       this.$axios.get('/airport/getAllAirport').then(res => {
         this.city = res.data.data
+        this.startRoute = this.city
       })
     },
     queryAll() {

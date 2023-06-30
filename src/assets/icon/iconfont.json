@@ -6,6 +6,27 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "1072934",
+      "name": "公告",
+      "font_class": "gonggao",
+      "unicode": "e650",
+      "unicode_decimal": 58960
+    },
+    {
+      "icon_id": "6246292",
+      "name": "公告",
+      "font_class": "gonggao1",
+      "unicode": "e649",
+      "unicode_decimal": 58953
+    },
+    {
+      "icon_id": "15920554",
+      "name": "托运",
+      "font_class": "tuoyun",
+      "unicode": "e7e6",
+      "unicode_decimal": 59366
+    },
+    {
       "icon_id": "990",
       "name": "旅行",
       "font_class": "lvxing",

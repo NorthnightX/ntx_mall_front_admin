@@ -69,6 +69,14 @@ const routes = [
       path: '/plane/planeType',
       name: 'planeType',
       component: () => import('../views/plane/planeType')
+    },{
+      path: '/baggage/baggage',
+      name: 'baggage',
+      component: () => import('../views/order/baggage.vue')
+    },{
+      path: '/announcement/announcement',
+      name: 'announcement',
+      component: () => import('../views/announcement/announcement.vue')
     }]
   }
 ]

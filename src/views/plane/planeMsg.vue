@@ -125,19 +125,6 @@
             placeholder="选择日期">
           </el-date-picker>
         </el-form-item>
-        <el-form-item label="服役年限" prop="serviceYears">
-          <el-select size="small" v-model="addPlaneForm.serviceYears" placeholder="请选择">
-            <el-option v-for="num in 15" :key="num" :label="num" :value="num"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="上次检修日期" prop="lastMaintenanceDate">
-          <el-date-picker
-            v-model="addPlaneForm.lastMaintenanceDate"
-            type="date"
-            value-format="yyyy-MM-dd"
-            placeholder="选择日期">
-          </el-date-picker>
-        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button size="small" @click='closeDialog("edit")'>取消</el-button>
@@ -195,8 +182,6 @@ export default {
         modelId:'',
         aircraftCode:'',
         purchaseDate:'',
-        serviceYears:'',
-        lastMaintenanceDate:''
       },
       editPlaneForm:{
        modelId:'',
