@@ -65,6 +65,13 @@ export default {
               hasThird: 'N',
               url: 'person/user',
               menus: null
+            }, {
+              menuid: 5,
+              icon: 'icon-VIP',
+              menuname: '用户管理',
+              hasThird: 'N',
+              url: 'person/vip',
+              menus: null
             }
           ]
         },
