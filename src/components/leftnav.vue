@@ -68,7 +68,7 @@ export default {
             }, {
               menuid: 5,
               icon: 'icon-VIP',
-              menuname: '用户管理',
+              menuname: 'VIP管理',
               hasThird: 'N',
               url: 'person/vip',
               menus: null

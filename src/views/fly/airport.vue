@@ -76,11 +76,11 @@
           <el-input size="small" v-model="editAirportForm.city" auto-complete="off" placeholder="请输入城市"></el-input>
         </el-form-item>
         <el-form-item label="机场坐标X" prop="airportCoordinateX">
-          <el-input size="small" v-model="editAirportForm.airportCoordinateX" auto-complete="off"
+          <el-input type="number" size="small" v-model="editAirportForm.airportCoordinateX" auto-complete="off"
                     placeholder="请输入坐标X"></el-input>
         </el-form-item>
         <el-form-item label="机场坐标Y" prop="airportCoordinateY">
-          <el-input size="small" v-model="editAirportForm.airportCoordinateY" auto-complete="off"
+          <el-input type="number" size="small" v-model="editAirportForm.airportCoordinateY" auto-complete="off"
                     placeholder="请输入坐标Y"></el-input>
         </el-form-item>
       </el-form>
@@ -103,10 +103,10 @@
           <el-input size="small" v-model="editAddAirportForm.city" auto-complete="off" placeholder="请输入城市"></el-input>
         </el-form-item>
         <el-form-item label="X坐标" prop="airportCoordinateX">
-          <el-input size="small" v-model="editAddAirportForm.airportCoordinateX" auto-complete="off" placeholder="请输入X坐标"></el-input>
+          <el-input type="number" size="small" v-model="editAddAirportForm.airportCoordinateX" auto-complete="off" placeholder="请输入X坐标"></el-input>
         </el-form-item>
         <el-form-item label="Y坐标" prop="airportCoordinateY">
-          <el-input size="small" v-model="editAddAirportForm.airportCoordinateY" auto-complete="off" placeholder="请输入Y坐标"></el-input>
+          <el-input type="number" size="small" v-model="editAddAirportForm.airportCoordinateY" auto-complete="off" placeholder="请输入Y坐标"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">

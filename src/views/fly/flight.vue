@@ -91,7 +91,7 @@
     </el-table>
     <!-- 编辑界面 -->
     <el-dialog :title="title" :visible.sync="editFormVisible" width="50%" @click='closeDialog("edit")'>
-      <el-form label-width="140px" ref="editFlightForm" :model="editFlightForm" :rules="rules">
+      <el-form label-width="150px" ref="editFlightForm" :model="editFlightForm" :rules="rules">
         <el-form-item label="起始机场" prop="departureAirportId">
           <el-select size="small" @change='queryByStartAirport(editFlightForm.departureAirportId)' v-model="editFlightForm.departureAirportId" filterable clearable placeholder="请选择起始机场">
             <el-option
@@ -112,22 +112,8 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="经济舱剩余座位数量" prop="economyClassNum">
-          <el-input size="small" v-model="editFlightForm.economyClassNum" auto-complete="off" placeholder="请输入经济舱座位数"></el-input>
-        </el-form-item>
-        <el-form-item label="头等舱剩余座位数量" prop="firstClassNum">
-          <el-input size="small" v-model="editFlightForm.firstClassNum" auto-complete="off"
-                    placeholder="请输入头等舱座位数"></el-input>
-        </el-form-item>
-        <el-form-item label="头等舱价格" prop="firstClassPrice">
-          <el-input size="small" v-model="editFlightForm.firstClassPrice" auto-complete="off" placeholder="请输入头等舱座位数"></el-input>
-        </el-form-item>
-        <el-form-item label="经济舱价格" prop="economyClassPrice">
-          <el-input size="small" v-model="editFlightForm.economyClassPrice" auto-complete="off"
-                    placeholder="请输入经济舱座位数"></el-input>
-        </el-form-item>
         <el-form-item label="飞机编号" prop="aircraftId">
-          <el-select size="small" v-model="editFlightForm.aircraftId" filterable clearable placeholder="请选择飞机类型">
+          <el-select size="small" v-model="editFlightForm.aircraftId"  @change='selectPlane(editFlightForm.aircraftId)' filterable clearable placeholder="请选择飞机类型">
             <el-option
               v-for="item in plane"
               :key="item.id"
@@ -135,6 +121,21 @@
               :value="item.id">
             </el-option>
           </el-select>
+        </el-form-item>
+<!--        不能超过飞机类型的最大座位数-->
+        <el-form-item label="经济舱剩余座位数量" prop="economyClassNum">
+          <el-input-number size="small"  v-model="editFlightForm.economyClassNum" :disabled = disabledFlight auto-complete="off" :placeholder="'请输入经济舱座位数:(最大数量)' + aircraftType.economyClassCapacity" :max="aircraftType.economyClassCapacity"></el-input-number>
+        </el-form-item>
+        <el-form-item label="头等舱剩余座位数量" prop="firstClassNum">
+          <el-input-number size="small" v-model="editFlightForm.firstClassNum" :disabled = disabledFlight auto-complete="off" :placeholder="'请输入头等舱座位数:(最大数量)' + aircraftType.firstClassCapacity" :max="aircraftType.firstClassCapacity"></el-input-number>
+        </el-form-item>
+
+        <el-form-item label="头等舱价格" prop="firstClassPrice">
+          <el-input type="number" size="small" v-model="editFlightForm.firstClassPrice" auto-complete="off" placeholder="请输入头等舱座位数"></el-input>
+        </el-form-item>
+        <el-form-item label="经济舱价格" prop="economyClassPrice">
+          <el-input type="number" size="small" v-model="editFlightForm.economyClassPrice" auto-complete="off"
+                    placeholder="请输入经济舱座位数"></el-input>
         </el-form-item>
         <el-form-item label="离开时间" prop="departureTime">
           <el-date-picker
@@ -167,7 +168,7 @@
     </el-dialog>
     <!--    新增航线-->
     <el-dialog :title="title" :visible.sync="addFormVisible" width="50%" @click='closeDialog("edit")'>
-      <el-form label-width="140px" ref="editFlightForm" :model="editAddFlightForm" :rules="rules">
+      <el-form label-width="150px" ref="editFlightForm" :model="editAddFlightForm" :rules="rules">
         <el-form-item label="起始机场" prop="departureAirportId">
           <el-select size="small" @change='queryByStartAirport($event)' v-model="editAddFlightForm.departureAirportId" filterable clearable placeholder="请选择起始机场">
             <el-option
@@ -188,22 +189,8 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="经济舱剩余座位数量" prop="economyClassNum">
-          <el-input size="small" v-model="editAddFlightForm.economyClassNum" auto-complete="off" placeholder="请输入经济舱座位数"></el-input>
-        </el-form-item>
-        <el-form-item label="头等舱剩余座位数量" prop="firstClassNum">
-          <el-input size="small" v-model="editAddFlightForm.firstClassNum" auto-complete="off"
-                    placeholder="请输入头等舱座位数"></el-input>
-        </el-form-item>
-        <el-form-item label="头等舱价格" prop="firstClassPrice">
-          <el-input size="small" v-model="editAddFlightForm.firstClassPrice" auto-complete="off" placeholder="请输入头等舱座位数"></el-input>
-        </el-form-item>
-        <el-form-item label="经济舱价格" prop="economyClassPrice">
-          <el-input size="small" v-model="editAddFlightForm.economyClassPrice" auto-complete="off"
-                    placeholder="请输入经济舱座位数"></el-input>
-        </el-form-item>
         <el-form-item label="飞机编号" prop="aircraftId">
-          <el-select size="small" v-model="editAddFlightForm.aircraftId" filterable clearable placeholder="请选择飞机类型">
+          <el-select size="small" v-model="editAddFlightForm.aircraftId" @change='selectPlane(editAddFlightForm.aircraftId)' filterable clearable placeholder="请选择飞机类型">
             <el-option
               v-for="item in plane"
               :key="item.id"
@@ -211,6 +198,21 @@
               :value="item.id">
             </el-option>
           </el-select>
+        </el-form-item>
+
+        <el-form-item label="经济舱剩余座位数量" prop="economyClassNum">
+          <el-input-number size="small" v-model="editAddFlightForm.economyClassNum" :disabled = disabledFlight auto-complete="off" :placeholder="'请输入经济舱座位数:(最大数量)' + aircraftType.economyClassCapacity" :max="aircraftType.economyClassCapacity"></el-input-number>
+        </el-form-item>
+        <el-form-item label="头等舱剩余座位数量" prop="firstClassNum">
+          <el-input-number size="small" v-model="editAddFlightForm.firstClassNum" :disabled = disabledFlight auto-complete="off" :placeholder="'请输入头等舱座位数:(最大数量)' + aircraftType.firstClassCapacity" :max="aircraftType.firstClassCapacity"></el-input-number>
+        </el-form-item>
+
+        <el-form-item label="头等舱价格" prop="firstClassPrice">
+          <el-input type="number" size="small" v-model="editAddFlightForm.firstClassPrice" auto-complete="off"  placeholder="请输入头等舱价格"></el-input>
+        </el-form-item>
+        <el-form-item label="经济舱价格" prop="economyClassPrice">
+          <el-input type="number" size="small" v-model="editAddFlightForm.economyClassPrice" auto-complete="off"
+                    placeholder="请输入经济舱价格"></el-input>
         </el-form-item>
         <el-form-item label="离开时间" prop="departureTime">
           <el-date-picker
@@ -267,6 +269,8 @@ export default {
         economyClassPrice:'',
         destinationAirportId:''
       },
+      placeholder:'',
+      disabledFlight: true,
       disabled : true,
       title1:"新增航班",
       title: "修改航班",
@@ -331,13 +335,23 @@ export default {
       },
       city:[],
       plane:[],
-      startRoute:[]
+      startRoute:[],
+      aircraftType:[]
     }
   },
   /* 定义事件函数 */
   methods:{
+
+    selectPlane(id){
+      this.$axios.get(`/aircraftInformation/getModel/${id}`).then(res => {
+        this.aircraftType = res.data.data
+        this.disabledFlight = false
+      })
+
+    },
     addFlight(){
       this.addFormVisible = true
+      this.disabledFlight = true
       this.queryAllCity()
       this.queryPlaneMsg()
     },
@@ -414,6 +428,7 @@ export default {
       this.queryAllCity()
       this.queryPlaneMsg()
       this.disabled = true
+      this.disabledFlight = true
     },
     queryPlaneMsg(){
       this.$axios.get('/aircraftInformation/getAllPlane').then(res => {

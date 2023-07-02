@@ -51,20 +51,20 @@
     </el-table>
     <!-- 编辑界面 -->
     <el-dialog :title="title" :visible.sync="editFormVisible" width="40%" @click='closeDialog("edit")'>
-      <el-form label-width="90px" ref="editTypeForm" :model="editTypeForm" :rules="rules">
+      <el-form label-width="130px" ref="editTypeForm" :model="editTypeForm" :rules="rules">
         <el-form-item label="飞机型号" prop="model">
           <el-input size="small" v-model="editTypeForm.model" auto-complete="off"
                     placeholder="请输入飞机型号"></el-input>
         </el-form-item>
         <el-form-item label="客容量" prop="passengerCapacity">
-          <el-input size="small" v-model="editTypeForm.passengerCapacity" auto-complete="off"
+          <el-input type="number" size="small" v-model="editTypeForm.passengerCapacity" auto-complete="off"
                     placeholder="请输入客容量"></el-input>
         </el-form-item>
         <el-form-item label="头等舱座位数" prop="firstClassCapacity">
-          <el-input size="small" v-model="editTypeForm.firstClassCapacity" auto-complete="off" placeholder="请输入头等舱座位数"></el-input>
+          <el-input type="number" size="small" v-model="editTypeForm.firstClassCapacity" auto-complete="off" placeholder="请输入头等舱座位数"></el-input>
         </el-form-item>
         <el-form-item label="经济舱座位数" prop="economyClassCapacity">
-          <el-input size="small" v-model="editTypeForm.economyClassCapacity" auto-complete="off"
+          <el-input type="number" size="small" v-model="editTypeForm.economyClassCapacity" auto-complete="off"
                     placeholder="请输入经济舱座位数"></el-input>
         </el-form-item>
       </el-form>
@@ -82,14 +82,14 @@
                     placeholder="请输入飞机型号"></el-input>
         </el-form-item>
         <el-form-item label="客容量" prop="passengerCapacity">
-          <el-input size="small" v-model="addTypeForm.passengerCapacity" auto-complete="off"
+          <el-input type="number" size="small" v-model="addTypeForm.passengerCapacity" auto-complete="off"
                     placeholder="请输入客容量"></el-input>
         </el-form-item>
         <el-form-item label="头等舱座位数" prop="firstClassCapacity">
-          <el-input size="small" v-model="addTypeForm.firstClassCapacity" auto-complete="off" placeholder="请输入头等舱座位数"></el-input>
+          <el-input type="number" size="small" v-model="addTypeForm.firstClassCapacity" auto-complete="off" placeholder="请输入头等舱座位数"></el-input>
         </el-form-item>
         <el-form-item label="经济舱座位数" prop="economyClassCapacity">
-          <el-input size="small" v-model="addTypeForm.economyClassCapacity" auto-complete="off"
+          <el-input type="number" size="small" v-model="addTypeForm.economyClassCapacity" auto-complete="off"
                     placeholder="请输入经济舱座位数"></el-input>
         </el-form-item>
       </el-form>
