@@ -38,6 +38,9 @@
         <el-form-item>
           <el-button size="small" type="primary" icon="el-icon-search" @click="search()">搜索</el-button>
         </el-form-item>
+        <el-form-item>
+          <el-button size="small" type="primary" icon="el-icon-circle-plus" @click="exportData()">导出数据</el-button>
+        </el-form-item>
       </el-form-item>
     </el-form>
     <!--列表-->
@@ -152,6 +155,7 @@
 </template>
 
 <script>
+import FileSaver from 'file-saver';
 export default {
   name: "order",
   data(){
@@ -221,6 +225,32 @@ export default {
   },
   /* 定义事件函数 */
   methods:{
+    exportData() {
+      // 模拟要导出的数据
+      const data = this.orderData;
+      // 将数据转换为CSV格式
+      const csvData = this.convertToCSV(data);
+      // 创建Blob对象
+      const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8' });
+      // 使用FileSaver.js保存文件
+      FileSaver.saveAs(blob, 'data.csv');
+    },
+    convertToCSV(data) {
+      // 将数据转换为CSV格式的字符串
+      const csvRows = [];
+      const headers = Object.keys(data[0]);
+      csvRows.push(headers.join(','));
+
+      for (const row of data) {
+        const values = headers.map(header => {
+          const escaped = ('' + row[header]).replace(/"/g, '\\"');
+          return `"${escaped}"`;
+        });
+        csvRows.push(values.join(','));
+      }
+
+      return csvRows.join('\n');
+    },
     closeDialog() {
       this.editFormVisible = false
       this.addFormVisible = false
@@ -319,6 +349,7 @@ export default {
           this.orderData = res.data.data.records
           this.pageNum = res.data.data.current
           this.total = res.data.data.total
+          console.log(this.orderData);
         } else {
           this.$message.warning(res.data.data)
         }
