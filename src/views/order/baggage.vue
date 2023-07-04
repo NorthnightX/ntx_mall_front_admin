@@ -28,8 +28,8 @@
       </el-table-column>
       <el-table-column label="操作" min-width="150">
         <template slot-scope="scope">
-          <el-button size="mini" @click="handleEdit(scope.row)">编辑</el-button>
-          <el-button size="mini" type="danger" @click="deleteBaggage(scope.row.baggageId)">删除</el-button>
+          <el-button size="mini" v-show="userKind !== '-2'" @click="handleEdit(scope.row)">编辑</el-button>
+          <el-button size="mini" v-show="userKind !== '-2'" type="danger" @click="deleteBaggage(scope.row.baggageId)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -70,6 +70,7 @@ export default {
   data(){
     /* 定义初始化变量 */
     return{
+      userKind:'',
       title: "修改托运信息",
       loading: false, //显示加载
       editFormVisible: false,
@@ -100,6 +101,11 @@ export default {
   },
   /* 定义事件函数 */
   methods:{
+    getUserKind(){
+      const userDataJSON = sessionStorage.getItem("user");
+      const userData = JSON.parse(userDataJSON);
+      this.userKind = userData.vipStatus
+    },
     deleteBaggage(baggageId){
       this.$confirm('确定要删除吗?', '信息', {
         confirmButtonText: '确定',
@@ -177,6 +183,7 @@ export default {
   */
   created() {
     this.queryAll()
+    this.getUserKind()
   }
 }
 </script>

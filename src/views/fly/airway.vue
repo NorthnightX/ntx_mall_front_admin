@@ -30,7 +30,7 @@
         <el-button size="small" type="primary" icon="el-icon-search" @click="search">搜索</el-button>
       </el-form-item>
       <el-form-item>
-        <el-button size="small" type="primary" icon="el-icon-circle-plus" @click="addRoute()">添加航线</el-button>
+        <el-button size="small" type="primary" icon="el-icon-circle-plus" v-show="this.userKind !== '-2'" @click="addRoute()">添加航线</el-button>
       </el-form-item>
     </el-form>
 
@@ -51,8 +51,8 @@
 
       <el-table-column label="操作" min-width="150">
         <template slot-scope="scope">
-          <el-button size="mini" @click="handleEdit(scope.row)">编辑</el-button>
-          <el-button size="mini" type="danger" @click="deleteAriway(scope.row.id)">删除</el-button>
+          <el-button size="mini" v-show="userKind !== '-2'" @click="handleEdit(scope.row)">编辑</el-button>
+          <el-button size="mini" v-show="userKind !== '-2'" type="danger" @click="deleteAriway(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -136,6 +136,7 @@ export default {
     /* 定义初始化变量 */
     return {
       // 基本信息
+      userKind:'',
       editAddRouteForm:{
         destinationAirportId:'',
         departureAirportId:''
@@ -176,6 +177,7 @@ export default {
   created() {
     this.queryAll()
     this.getAllAirport()
+    this.getUserKind()
   },
   /* 定义事件函数 */
   methods: {
@@ -254,6 +256,12 @@ export default {
           })
         })
     },
+    getUserKind(){
+      const userDataJSON = sessionStorage.getItem("user");
+      const userData = JSON.parse(userDataJSON);
+      this.userKind = userData.vipStatus
+      console.log(this.userKind);
+    },
     // 获取初始化信息
     queryAll() {
       this.$axios.get('/route/queryAll', {
@@ -272,6 +280,7 @@ export default {
     // 搜索事件
     search() {
       this.queryAll()
+
     }
   }
 }

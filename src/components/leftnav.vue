@@ -458,8 +458,11 @@ export default {
           return allowedMenus.includes(menu.menuname);
         });
       } else {
-        // 其他管理员类型的处理逻辑
-        this.filteredMenu = [];
+        //订票代理
+        this.filteredMenu = this.allmenu.filter(menu => {
+          const allowedMenus = ['订单管理', '航行管理', '公告管理'];
+          return allowedMenus.includes(menu.menuname);
+        });
       }
     }
   }

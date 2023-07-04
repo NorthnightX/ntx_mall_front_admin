@@ -9,38 +9,9 @@
     <!-- 搜索，切换 -->
     <el-row :gutter="23">
       <el-col :span="18">
-        <div class="stbgc">
-          <el-row :gutter="23">
-            <el-col :span="7">
-              <el-input size="small" v-model="machineNo" placeholder="请输入所属公司"></el-input>
-            </el-col>
-            <el-col :span="7">
-              <el-input size="small" v-model="machineNo" placeholder="请输入资产编号"></el-input>
-            </el-col>
-            <el-col :span="7">
-              <el-input size="small" v-model="machineNo" placeholder="请输入"></el-input>
-            </el-col>
-            <el-col :span="3" class="stsearch">
-              <el-button size="small" type="primary">搜索</el-button>
-            </el-col>
-          </el-row>
-        </div>
+
       </el-col>
-      <el-col :span="6">
-        <div class="stbgc">
-          <el-row>
-            <el-col :span="8" class="text-c">
-              <el-radio v-model="type" label="day">日</el-radio>
-            </el-col>
-            <el-col :span="8" class="text-c">
-              <el-radio v-model="type" label="month">月</el-radio>
-            </el-col>
-            <el-col :span="8" class="text-c">
-              <el-radio v-model="type" label="years">年</el-radio>
-            </el-col>
-          </el-row>
-        </div>
-      </el-col>
+
     </el-row>
     <!-- 统计图 -->
     <el-row :gutter="23">
@@ -86,9 +57,11 @@ export default {
   data() {
     return {
       revenueByMonth : [1, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      monthlyOrderCount:[],
       orderData: [],
       monthlyRevenue :[],
       machineNo: '',
+      seatRate:'',
       type: 'day',
       //  销售总笔数
       SCEoption: {
@@ -258,6 +231,7 @@ export default {
             color: "#108ff9"
           }
         }]
+
       },
       //  总点击量
       Clickoption: {
@@ -337,7 +311,7 @@ export default {
       payoption: {
         backgroundColor: '#2c343c',
         title: {
-          text: '支付方式统计(金额)',
+          text: '登机人数统计',
           left: 10,
           top: 5,
           textStyle: {
@@ -411,7 +385,7 @@ export default {
       payNumoption: {
         backgroundColor: '#2c343c',
         title: {
-          text: '支付方式统计(笔数)',
+          text: '上座率统计',
           left: 10,
           top: 5,
           textStyle: {
@@ -492,40 +466,80 @@ export default {
   // 创建完毕状态(里面是操作)
   created() {
     this.getAll()
+    this.seatRateNum()
   },
   // 挂载结束状态(里面是操作)
   mounted() {
+    this.updateRevenue()
     this.getSCE()
-    this.getSUM()
     this.getClick()
     this.getpay()
     this.getpayNum()
+    this.getAll()
+    this.seatRateNum()
+
   },
   // 里面的函数只有调用才会执行
   methods: {
     updateRevenue() {
-      const monthlyRevenue = {};
-      this.orderData.forEach(order => {
-        const orderDate = new Date(order.orderTime);
-        const month = orderDate.getMonth() + 1; // 加上 1
-        if (monthlyRevenue[month]) {
-          monthlyRevenue[month] += order.amount;
-        } else {
-          monthlyRevenue[month] = order.amount;
-        }
-      });
-      console.log(monthlyRevenue);
+      console.log(this.monthlyRevenue);
     },
-
-
     getAll() {
       this.$axios.get('/order/getAll').then(res => {
         if (res.data.code === 200) {
           this.orderData = res.data.data
           this.updateRevenue()
+
+          this.monthlyRevenue = [0,0,0,0,0,0,0,0,0,0,0,0]
+          this.monthlyOrderCount = [0,0,0,0,0,0,0,0,0,0,0,0]
+          this.orderData.forEach(order => {
+            const orderDate = new Date(order.orderTime);
+            const month = orderDate.getMonth() + 1; // 加上 1
+            if (this.monthlyRevenue[month]) {
+              this.monthlyOrderCount[month] += 1
+              this.monthlyRevenue[month] += order.amount;
+            } else {
+              this.monthlyOrderCount[month] += 1
+              this.monthlyRevenue[month] = order.amount;
+            }
+          });
+          this.SCEoption.series[0].data=this.monthlyOrderCount
+          this.SUMoption.series[0].data=this.monthlyRevenue
+          // 交易总金额
+          this.getSCE()
+          this.getSUM()
+
+
         } else {
           this.$message.warning(res.data.data)
         }
+
+      })
+
+      this.$axios.get('/order/attendance').then(res => {
+          if (res.data.code === 200) {
+            console.log("payoption",res.data.data);
+            this.payoption.series[0].data=res.data.data
+            this.getpay()
+            // {value: 335, name: '支付宝'},
+            // {value: 310, name: '银商二维码'},
+            // {value: 274, name: '会员'},
+            // {value: 235, name: '微信支付'},
+            // {value: 100, name: 'Pos通'}
+
+          } else {
+            this.$message.warning(res.data.data)
+          }
+
+      })
+
+    },
+    //出票率
+    seatRateNum(){
+      this.$axios.get('/flight/seatRate').then(res => {
+        this.seatRate = res.data.data
+        this.payNumoption.series[0].data = this.seatRate
+        this.getpayNum()
       })
     },
     // 交易总笔数
@@ -533,11 +547,12 @@ export default {
       this.chart = Chart.init(this.$refs.SCEchart)
       this.chart.setOption(this.SCEoption)
     },
-    // 交易总金额
-    getSUM() {
+    //每月交易总额
+    getSUM(){
       this.chart = Chart.init(this.$refs.SUMEchart)
       this.chart.setOption(this.SUMoption)
     },
+
     // 总点击量
     getClick() {
       this.chart = Chart.init(this.$refs.ClickEchart)
@@ -553,7 +568,6 @@ export default {
       this.chart = Chart.init(this.$refs.payNumEchart)
       this.chart.setOption(this.payNumoption)
     }
-
   }
 };
 </script>

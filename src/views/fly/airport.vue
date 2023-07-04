@@ -29,7 +29,7 @@
           <el-button size="small" type="primary" icon="el-icon-search" @click="queryByName()">搜索</el-button>
         </el-form-item>
         <el-form-item>
-          <el-button size="small" type="primary" icon="el-icon-circle-plus" @click="addAirport()">添加机场</el-button>
+          <el-button size="small" type="primary" icon="el-icon-circle-plus" v-show="this.userKind !== '-2'" @click="addAirport()">添加机场</el-button>
         </el-form-item>
       </el-form-item>
     </el-form>
@@ -56,8 +56,8 @@
       </el-table-column>
       <el-table-column label="操作" min-width="300">
         <template slot-scope="scope">
-          <el-button size="mini" @click="handleEdit(scope.row)">编辑</el-button>
-          <el-button size="mini" type="danger" @click="deleteAirport(scope.row.id)">删除</el-button>
+          <el-button size="mini" v-show="userKind !== '-2'" @click="handleEdit(scope.row)">编辑</el-button>
+          <el-button size="mini" v-show="userKind !== '-2'" type="danger" @click="deleteAirport(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -135,6 +135,7 @@ export default {
   data() {
     /* 定义初始化变量 */
     return {
+      userKind:'',
       editAddAirportForm:{
         province: '',
         city: '',
@@ -253,6 +254,12 @@ export default {
       this.pageNum = 1
       this.queryAll()
     },
+    getUserKind(){
+      const userDataJSON = sessionStorage.getItem("user");
+      const userData = JSON.parse(userDataJSON);
+      this.userKind = userData.vipStatus
+      console.log(this.userKind);
+    },
     queryAll() {
       this.$axios.get('/airport/queryAll', {
         params: {
@@ -275,6 +282,7 @@ export default {
   */
   created() {
     this.queryAll()
+    this.getUserKind()
   }
 }
 </script>

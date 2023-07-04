@@ -1,6 +1,6 @@
 <template>
   <div class="login-wrap">
-    <el-card class="loginCord">
+    <el-card class="loginCord" v-show="!agentLoginShow">
       <div class="loginTitle">登录</div>
       <el-form :model="loginForm" ref="loginForm" :rules="loginRules">
         <el-form-item prop="account">
@@ -25,6 +25,37 @@
           <el-button class="loginButton" type="primary" @click="login('loginForm')">登录</el-button>
         </el-form-item>
       </el-form>
+      <el-button style="color: #3a8ee6; margin-left: 270px" type="text" @click="agentLogin()">代理登录</el-button>
+    </el-card>
+
+    <el-card class="loginCord" v-show="agentLoginShow">
+      <div class="loginTitle">登录</div>
+      <el-form :model="loginForm" ref="loginForm" :rules="loginRules">
+        <el-form-item prop="account">
+          <el-input v-model="loginForm.account" placeholder="请输入用户名"></el-input>
+        </el-form-item>
+        <el-form-item prop="password">
+          <el-input type="password"  show-password v-model="loginForm.password" placeholder="请输入密码"></el-input>
+        </el-form-item>
+
+        <el-form-item prop="code">
+          <el-input placeholder="请输入验证码" v-model="loginForm.code">
+            <div class="codeClass" slot="append">
+              <div>
+                <img  @click="getCode" width="80px" :src="url">
+              </div>
+              <div v-show="time >= 0">{{ time  }}S</div>
+              <div v-show="time < 0">请刷新</div>
+            </div>
+          </el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-form-item>
+            <el-button class="loginButton" type="primary" @click="loginAgent('loginForm')">登录</el-button>
+          </el-form-item>
+        </el-form-item>
+      </el-form>
+      <el-button style="color: #3a8ee6; margin-left: 270px" type="text" @click="adminLogin()">管理员登录</el-button>
     </el-card>
   </div>
 </template>
@@ -34,6 +65,7 @@ export default {
   data(){
     /* 定义初始化变量 */
     return{
+      agentLoginShow: false,
       time:60,
       interval:'',//定时器
       url:'',
@@ -56,11 +88,36 @@ export default {
   },
   /* 定义事件函数 */
   methods:{
+    adminLogin(){
+      this.agentLoginShow = false
+    },
+    agentLogin(){
+      this.agentLoginShow = true
+    },
     login(formName){
       this.$refs[formName].validate(valid=>{
         if(valid){
           this.loginForm.redisKey = this.redisKey
           this.$axios.post('/admin/login',this.loginForm).then(res =>{
+            if(res.data.code === 200){
+              this.$message.success("登陆成功")
+              sessionStorage.setItem('token', res.data.data)
+              this.$router.push('/charts/statistics')
+            }else {
+              this.$message.error(res.data.data)
+            }
+          })
+        } else
+        {
+          this.$message.error('请输入完整')
+        }
+      })
+    },
+    loginAgent(formName){
+      this.$refs[formName].validate(valid=>{
+        if(valid){
+          this.loginForm.redisKey = this.redisKey
+          this.$axios.post('/agent/login',this.loginForm).then(res =>{
             if(res.data.code === 200){
               this.$message.success("登陆成功")
               sessionStorage.setItem('token', res.data.data)

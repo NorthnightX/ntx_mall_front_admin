@@ -40,7 +40,7 @@
         <el-button size="small" type="primary" icon="el-icon-search" @click="search">搜索</el-button>
       </el-form-item>
       <el-form-item>
-        <el-button size="small" type="primary" icon="el-icon-circle-plus" @click="addFlight()">添加航班</el-button>
+        <el-button size="small" type="primary" icon="el-icon-circle-plus" v-show="this.userKind !== '-2'" @click="addFlight() ">添加航班</el-button>
       </el-form-item>
       <el-form-item>
         <el-button size="small" type="primary" icon="el-icon-circle-plus" @click="exportData()">导出数据</el-button>
@@ -85,10 +85,10 @@
       <el-table-column align="center" sortable prop="modifier" label="修改人" width="100">
       </el-table-column>
 
-      <el-table-column label="操作" min-width="150">
-        <template slot-scope="scope">
-          <el-button size="mini" @click="handleEdit(scope.row)">编辑</el-button>
-          <el-button size="mini" type="danger" @click="deleteFlight(scope.row.flightId)">删除</el-button>
+      <el-table-column label="操作" min-width="150" >
+        <template slot-scope="scope" >
+          <el-button size="mini" v-show="userKind !== '-2'" @click="handleEdit(scope.row)">编辑</el-button>
+          <el-button size="mini" v-show="userKind !== '-2'" type="danger" @click="deleteFlight(scope.row.flightId)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -264,6 +264,7 @@ export default {
     /* 定义初始化变量 */
     return{
       // 基本信息
+      userKind:'',
       editAddFlightForm:{
         departureAirportId : '',
         aircraftId: '',
@@ -483,6 +484,11 @@ export default {
         this.startRoute = this.city
       })
     },
+    getUserKind(){
+      const userDataJSON = sessionStorage.getItem("user");
+      const userData = JSON.parse(userDataJSON);
+      this.userKind = userData.vipStatus
+    },
     queryAll() {
       this.$axios.get('/flight/queryAll', {
         params: {
@@ -511,6 +517,7 @@ export default {
   created() {
     this.queryAll()
     this.queryAllCity()
+    this.getUserKind()
   }
 }
 </script>

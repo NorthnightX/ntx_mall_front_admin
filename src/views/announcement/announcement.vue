@@ -6,7 +6,7 @@
     </el-breadcrumb>
 
     <!--条件查询-->
-    <el-form :inline="true" :model="formInline" class="user-search">
+    <el-form :inline="true" :model="formInline" class="user-search" >
       <el-form-item label="搜索：">
         <el-input size="small" v-model="formInline.title" placeholder="输入公告标题"></el-input>
       </el-form-item>
@@ -21,7 +21,7 @@
         <el-button size="small" type="primary" icon="el-icon-search" @click="queryBy()">搜索</el-button>
       </el-form-item>
       <el-form-item>
-        <el-button size="small" type="primary" icon="el-icon-search" @click="add()">新增公告</el-button>
+          <el-button size="small" type="primary" v-show="this.userKind !== '-2'" icon="el-icon-search" @click="add()">新增公告</el-button>
       </el-form-item>
     </el-form>
     <!--内容-->
@@ -34,8 +34,8 @@
           <div >
             {{ item.content}}
           </div>
-          <div class="button-list">
-            <el-switch v-model="item.status === 1 ? nshow : fshow" active-color="#13ce66" inactive-color="#ff4949" @change="editStatus(item)"></el-switch>
+          <div class="button-list" v-show="userKind !== '-2'">
+            <el-switch  v-model="item.status === 1 ? nshow : fshow" active-color="#13ce66" inactive-color="#ff4949" @change="editStatus(item)"></el-switch>
             <el-button  type="primary" icon="el-icon-edit" circle @click="handleEdit(item)"></el-button>
             <el-button type="danger" icon="el-icon-delete" circle @click="deleteAnnouncement(item.id)"></el-button>
           </div>
@@ -106,6 +106,7 @@ export default {
   data(){
     /* 定义初始化变量 */
     return{
+      userKind:'',
       addFormVisible: false,
       showDeleteButton: false,
       pageNum: 1,
@@ -158,6 +159,11 @@ export default {
 
   /* 定义事件函数 */
   methods:{
+    getUserKind(){
+      const userDataJSON = sessionStorage.getItem("user");
+      const userData = JSON.parse(userDataJSON);
+      this.userKind = userData.vipStatus
+    },
     submitAddForm(formName){
       this.$axios.post("/announcement/addAnnouncement", this.editAddAnnouncementForm).then(res => {
         if (res.data.code === 200) {
@@ -253,6 +259,7 @@ export default {
       this.pageNum = val
       this.queryAll()
     },
+
     // 删除
     deleteAnnouncement(id){
       this.$confirm('确定要删除吗?', '信息', {
@@ -283,6 +290,7 @@ export default {
   */
   created() {
     this.queryAll()
+    this.getUserKind()
   }
 }
 </script>

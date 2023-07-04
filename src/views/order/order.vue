@@ -51,11 +51,16 @@
       </el-table-column>
       <el-table-column align="center"  prop="aircraftCode" label="飞机编号" width="150">
       </el-table-column>
-      <el-table-column align="center" sortable prop="bookingPerson" label="订票人" width="150">
+      <el-table-column align="center" sortable prop="bookPersonName" label="订票人" width="150">
       </el-table-column>
-      <el-table-column align="center" sortable prop="passenger" label="乘机人" width="150">
+      <el-table-column align="center" sortable prop="passengerName" label="乘机人" width="150">
       </el-table-column>
-      <el-table-column align="center" sortable prop="seatType" label="舱位种类" width="150">
+      <el-table-column
+        label="舱位种类" align="center" sortable prop="seatType">
+        <template slot-scope="scope">
+          <span v-if="scope.row.seatType === '1'">头等舱</span>
+          <span v-else>经济舱</span>
+        </template>
       </el-table-column>
       <el-table-column align="center" sortable prop="amount" label="实付金额" width="150">
       </el-table-column>
@@ -64,33 +69,29 @@
       <el-table-column
         label="是否升舱" align="center" sortable prop="isUpgrade">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.isUpgrade === 0 ? 'success' : 'info'"
-          >
-            {{ scope.row.isUpgrade === 0 ? '未升舱' : '升舱' }}
-          </el-tag>
+          <span v-if="scope.row.isUpgrade === '1'">升舱</span>
+          <span v-else>未升舱</span>
         </template>
       </el-table-column>
       <el-table-column
         label="订单状态" align="center" sortable prop="isCancelled">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.isCancelled === 0 ? 'success' : 'info'">
-            {{ scope.row.isCancelled === 1 ? '已完成' : '取消' }}
-          </el-tag>
+          <span v-if="scope.row.isCancelled === '1'">取消</span>
+          <span v-else>正常</span>
         </template>
       </el-table-column>
       <el-table-column
         label="是否托运" align="center" sortable prop="isCheckedBaggage">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.isCheckedBaggage === 0 ? 'success' : 'info'">
-            {{ scope.row.isCheckedBaggage === 0 ? '否' : '托运' }}
-          </el-tag>
+          <span v-if="scope.row.isCheckedBaggage === '1'">拖运</span>
+          <span v-else>不托运</span>
         </template>
       </el-table-column>
 
       <el-table-column label="操作" min-width="150">
         <template slot-scope="scope">
-          <el-button size="mini" @click="handleEdit(scope.row)">编辑</el-button>
-          <el-button size="mini" type="danger" @click="deleteOrder(scope.row.orderId)">删除</el-button>
+          <el-button size="mini" v-show="userKind !== '-2'" @click="handleEdit(scope.row)">编辑</el-button>
+          <el-button size="mini" v-show="userKind !== '-2'" type="danger" @click="deleteOrder(scope.row.orderId)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -110,26 +111,26 @@
         </el-form-item>
         <el-form-item label="是否托运" prop="isCheckedBaggage">
           <el-select size="small" v-model="editOrderForm.isCheckedBaggage" placeholder="请选择">
-            <el-option label="托运" :value="1"></el-option>
-            <el-option label="未托运" :value="0"></el-option>
+            <el-option label="托运" :value="'1'"></el-option>
+            <el-option label="未托运" :value="'0'"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="是否升舱" prop="isUpgrade">
           <el-select size="small" v-model="editOrderForm.isUpgrade" placeholder="请选择">
-            <el-option label="升舱" :value="1"></el-option>
-            <el-option label="未升舱" :value="0"></el-option>
+            <el-option label="升舱" :value="'1'"></el-option>
+            <el-option label="未升舱" :value="'0'"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="是否退票" prop="isCancelled">
           <el-select size="small" v-model="editOrderForm.isCancelled" placeholder="请选择">
-            <el-option label="未退票" :value="1"></el-option>
-            <el-option label="退票" :value="0"></el-option>
+            <el-option label="未退票" :value="'0'"></el-option>
+            <el-option label="退票" :value="'1'"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="是否未升舱机票" prop="isUpgradeOrder">
           <el-select size="small" v-model="editOrderForm.isUpgradeOrder" placeholder="请选择">
-            <el-option label="是" :value="1"></el-option>
-            <el-option label="不是" :value="0"></el-option>
+            <el-option label="是" :value="'1'"></el-option>
+            <el-option label="不是" :value="'0'"></el-option>
           </el-select>
         </el-form-item>
       </el-form>
@@ -161,6 +162,7 @@ export default {
   data(){
     /* 定义初始化变量 */
     return{
+      userKind:'',
       editAddFlightForm:{
         departureAirportId : '',
         aircraftId: '',
@@ -225,6 +227,12 @@ export default {
   },
   /* 定义事件函数 */
   methods:{
+    getUserKind(){
+      const userDataJSON = sessionStorage.getItem("user");
+      const userData = JSON.parse(userDataJSON);
+      this.userKind = userData.vipStatus
+      console.log(this.userKind);
+    },
     exportData() {
       // 模拟要导出的数据
       const data = this.orderData;
@@ -363,6 +371,7 @@ export default {
   created() {
     this.queryAll()
     this.queryAllCity()
+    this.getUserKind()
   }
 }
 </script>
