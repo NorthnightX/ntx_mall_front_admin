@@ -34,53 +34,13 @@ const routes = [
         requireAuth: true
       }
     },{
-      path: '/person/employee',
-      name: 'employee',
-      component: () => import('../views/person/employee.vue')
+      path: '/blog/blog',
+      name: 'blog',
+      component: () => import('../views/blog/blog.vue')
     },{
-      path: '/person/agent',
-      name: 'agent',
-      component: () => import('../views/person/agent.vue')
-    },{
-      path: '/person/user',
-      name: 'user',
-      component: () => import('../views/person/user.vue')
-    },{
-        path: '/person/vip',
-        name: 'user',
-        component: () => import('../views/person/vip.vue')
-      },{
-      path: '/fly/airport',
-      name: 'airport',
-      component: () => import('../views/fly/airport.vue')
-    },{
-      path: '/fly/airway',
-      name: 'airway',
-      component: () => import('../views/fly/airway.vue')
-    },{
-      path: '/fly/flight',
-      name: 'flight',
-      component: () => import('../views/fly/flight.vue')
-    },{
-      path: '/order/order',
-      name: 'order',
-      component: () => import('../views/order/order.vue')
-    },{
-      path: '/plane/planeMsg',
-      name: 'planeMsg',
-      component: () => import('../views/plane/planeMsg.vue')
-    },{
-      path: '/plane/planeType',
-      name: 'planeType',
-      component: () => import('../views/plane/planeType')
-    },{
-      path: '/baggage/baggage',
-      name: 'baggage',
-      component: () => import('../views/order/baggage.vue')
-    },{
-      path: '/announcement/announcement',
-      name: 'announcement',
-      component: () => import('../views/announcement/announcement.vue')
+      path: '/blog/blogType',
+      name: 'blogType',
+      component: () => import('../views/blog/blogType.vue')
     }]
   }
 ]

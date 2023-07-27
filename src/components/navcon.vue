@@ -27,15 +27,10 @@ export default {
   },
   // 创建完毕状态(里面是操作)
   created() {
-    this.getAdmin()
+
   },
   methods: {
-    getAdmin(){
-      this.$axios.post("/admin/getMe").then(res => {
-          this.user = res.data.data
-          sessionStorage.setItem("user", JSON.stringify(this.user));
-      })
-    },
+
     // 退出登录
     exit() {
       this.$confirm('退出登录, 是否继续?', '提示', {

@@ -10,15 +10,20 @@ import router from './router';
 
 // 引入icon
 import './assets/icon/iconfont.css'
-
 // 引入echarts
 import echarts from 'echarts'
 Vue.prototype.$echarts = echarts
-
+import VueQuillEditor from 'vue-quill-editor'
+//引入VueQuillEditor
+// 引入样式
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
+Vue.use(VueQuillEditor, /* { 默认全局 } */)
 import axios from 'axios';
-axios.defaults.baseURL='http://localhost:8081/atrs'
+axios.defaults.baseURL='http://localhost:10100'
 Vue.prototype.$axios = axios;
-Vue.prototype.pathURL='http://localhost:8081/atrs'
+Vue.prototype.pathURL='http://localhost:10100'
 Vue.config.productionTip = false;
 
 // 使用element UI
@@ -26,32 +31,32 @@ Vue.use(ElementUI);
 // 过滤器
 
 
-axios.interceptors.request.use(
-  config => {
-    let token = sessionStorage.getItem("token");
-    if(token) config.headers.authorization = token
-    return config
-  },
-  error => {
-    console.log("error")
-    return Promise.reject(error)
-  }
-)
-axios.interceptors.response.use(
-  response => {
-    // 检查是否需要清除 Session Storage 中的 token
-    const clearToken = response.headers['clear-token'];
-    if (clearToken === 'true') {
-      // 清除 Session Storage 中的 token 字段
-      sessionStorage.removeItem('token');
-    }
-
-    return response;
-  },
-  error => {
-    return Promise.reject(error);
-  }
-);
+// axios.interceptors.request.use(
+//   config => {
+//     let token = sessionStorage.getItem("token");
+//     if(token) config.headers.authorization = token
+//     return config
+//   },
+//   error => {
+//     console.log("error")
+//     return Promise.reject(error)
+//   }
+// )
+// axios.interceptors.response.use(
+//   response => {
+//     // 检查是否需要清除 Session Storage 中的 token
+//     const clearToken = response.headers['clear-token'];
+//     if (clearToken === 'true') {
+//       // 清除 Session Storage 中的 token 字段
+//       sessionStorage.removeItem('token');
+//     }
+//
+//     return response;
+//   },
+//   error => {
+//     return Promise.reject(error);
+//   }
+// );
 
 
 /* eslint-disable no-new */
