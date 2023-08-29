@@ -39,31 +39,82 @@ export default {
       data: [
         {
           menuid: 1,
-          icon: 'icon-renyuanguanli',
-          menuname: '博客管理',
+          icon: 'icon-renyuan',
+          menuname: '人员管理',
           hasThird: null,
           url: null,
           menus: [
             {
               menuid: 2,
-              icon: 'icon-yuangonggonghao',
-              menuname: '博客内容管理',
+              icon: 'icon-ic_person_card24px',
+              menuname: '员工管理',
               hasThird: 'N',
-              url: 'blog/blog',
+              url: 'user/admin',
               menus: null
-            }, {
-              menuid: 3,
-              icon: 'icon-dailishang',
-              menuname: '博客分类管理',
+            },
+            {
+              menuid: 2,
+              icon: 'icon-renyuan',
+              menuname: '用户管理',
               hasThird: 'N',
-              url: 'blog/blogType',
+              url: 'user/user',
               menus: null
             }
             ]
         },
         {
+          menuid: 1,
+          icon: 'icon-31quanbushangpin',
+          menuname: '商品管理',
+          hasThird: null,
+          url: null,
+          menus: [
+            {
+              menuid: 2,
+              icon: 'icon-shangpin',
+              menuname: '商品管理',
+              hasThird: 'N',
+              url: 'product/product',
+              menus: null
+            },
+            {
+              menuid: 2,
+              icon: 'icon-leibie',
+              menuname: '商品类别管理',
+              hasThird: 'N',
+              url: 'product/category',
+              menus: null
+            },
+            {
+              menuid: 2,
+              icon: 'icon-guanggaowei',
+              menuname: '广告管理',
+              hasThird: 'N',
+              url: 'product/advertise',
+              menus: null
+            }
+          ]
+        },
+        {
+          menuid: 1,
+          icon: 'icon-dingdan',
+          menuname: '订单管理',
+          hasThird: null,
+          url: null,
+          menus: [
+            {
+              menuid: 2,
+              icon: 'icon-dingdan1',
+              menuname: '订单管理',
+              hasThird: 'N',
+              url: 'order/order',
+              menus: null
+            },
+          ]
+        },
+        {
           menuid: 150,
-          icon: 'icon-tongji1',
+          icon: 'icon-tongjifenxi-changguitongji',
           menuname: '统计',
           hasThird: null,
           url: null,

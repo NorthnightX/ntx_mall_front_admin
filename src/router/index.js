@@ -4,6 +4,7 @@ import IndexView from '../views/index.vue'
 import {Message} from 'element-ui';
 import login from '../views/login.vue';
 import statistics from '../views/charts/statistics.vue';
+
 Vue.use(VueRouter)
 
 const routes = [
@@ -33,20 +34,40 @@ const routes = [
       meta: {
         requireAuth: true
       }
-    },{
-      path: '/blog/blog',
-      name: 'blog',
-      component: () => import('../views/blog/blog.vue')
-    },{
-      path: '/blog/blogType',
-      name: 'blogType',
-      component: () => import('../views/blog/blogType.vue')
-    }]
+    }, {
+      path: '/user/admin',
+      name: 'admin',
+      component: () => import('../views/user/admin.vue')
+    },
+      {
+        path: '/user/user',
+        name: 'user',
+        component: () => import('../views/user/user.vue')
+      },{
+      path: '/product/category',
+      name: 'category',
+      component: () => import('../views/product/category.vue')
+    },
+      {
+        path: '/product/product',
+        name: 'product',
+        component: () => import('../views/product/product.vue')
+      },
+      {
+        path: '/product/advertise',
+        name: 'advertise',
+        component: () => import('../views/product/advertise.vue')
+      },{
+        path: '/order/order',
+        name: 'order',
+        component: () => import('../views/order/order.vue')
+      }
+    ]
   }
 ]
 
 const router = new VueRouter({
-  mode: 'history',
+  mode: 'hash',
   base: process.env.BASE_URL,
   routes
 })
@@ -54,7 +75,7 @@ router.beforeEach((to, from, next) => {
   if (to.path === '/' || to.path === '/reg') {
     return next()
   } else {
-    let user = sessionStorage.getItem('token')
+    let user = localStorage.getItem('token')
     if (user != null) {
       //校验token
       return next()

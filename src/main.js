@@ -25,38 +25,31 @@ axios.defaults.baseURL='http://localhost:10100'
 Vue.prototype.$axios = axios;
 Vue.prototype.pathURL='http://localhost:10100'
 Vue.config.productionTip = false;
-
+import mavonEditor from 'mavon-editor'
+import 'mavon-editor/dist/css/index.css'
+Vue.use(mavonEditor);
 // 使用element UI
 Vue.use(ElementUI);
 // 过滤器
 
 
-// axios.interceptors.request.use(
-//   config => {
-//     let token = sessionStorage.getItem("token");
-//     if(token) config.headers.authorization = token
-//     return config
-//   },
-//   error => {
-//     console.log("error")
-//     return Promise.reject(error)
-//   }
-// )
-// axios.interceptors.response.use(
-//   response => {
-//     // 检查是否需要清除 Session Storage 中的 token
-//     const clearToken = response.headers['clear-token'];
-//     if (clearToken === 'true') {
-//       // 清除 Session Storage 中的 token 字段
-//       sessionStorage.removeItem('token');
-//     }
-//
-//     return response;
-//   },
-//   error => {
-//     return Promise.reject(error);
-//   }
-// );
+axios.interceptors.request.use(
+  config => {
+    let token = localStorage.getItem("token");
+    if(token) config.headers.authorization = token
+    return config
+  }
+)
+axios.interceptors.response.use(
+  response => {
+    // 检查是否需要清除 Session Storage 中的 token
+    const token= response.headers["authorization"];
+    if (token != null) {
+      localStorage.setItem("token", token)
+    }
+    return response;
+  }
+);
 
 
 /* eslint-disable no-new */
