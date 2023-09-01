@@ -34,20 +34,16 @@ const routes = [
       meta: {
         requireAuth: true
       }
-    }, {
-      path: '/user/admin',
-      name: 'admin',
-      component: () => import('../views/user/admin.vue')
     },
       {
         path: '/user/user',
         name: 'user',
         component: () => import('../views/user/user.vue')
-      },{
-      path: '/product/category',
-      name: 'category',
-      component: () => import('../views/product/category.vue')
-    },
+      }, {
+        path: '/product/category',
+        name: 'category',
+        component: () => import('../views/product/category.vue')
+      },
       {
         path: '/product/product',
         name: 'product',
@@ -57,7 +53,7 @@ const routes = [
         path: '/product/advertise',
         name: 'advertise',
         component: () => import('../views/product/advertise.vue')
-      },{
+      }, {
         path: '/order/order',
         name: 'order',
         component: () => import('../views/order/order.vue')

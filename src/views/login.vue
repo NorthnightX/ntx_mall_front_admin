@@ -67,7 +67,7 @@ export default {
               this.$message.success("登陆成功")
               localStorage.setItem('token', res.data.data.token)
               localStorage.setItem('user', res.data.data.user)
-              router.push("/user/admin")
+              router.push("/user/user")
             } else {
               this.$message.error(res.data.message)
             }

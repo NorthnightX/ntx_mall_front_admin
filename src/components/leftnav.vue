@@ -47,14 +47,6 @@ export default {
             {
               menuid: 2,
               icon: 'icon-ic_person_card24px',
-              menuname: '员工管理',
-              hasThird: 'N',
-              url: 'user/admin',
-              menus: null
-            },
-            {
-              menuid: 2,
-              icon: 'icon-renyuan',
               menuname: '用户管理',
               hasThird: 'N',
               url: 'user/user',
