@@ -132,7 +132,7 @@ export default {
       userData: [],
       nshow: true, //switch开启
       fshow: false, //switch关闭
-      title: '代理修改',
+      title: '用户修改',
       editFormVisible: false,
       editForm: {
         id: '',

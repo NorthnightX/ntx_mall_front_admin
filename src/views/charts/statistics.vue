@@ -43,7 +43,7 @@ export default {
       payoption: {
         backgroundColor: '#2c343c',
         title: {
-          text: '支付方式比例',
+          text: '订单状态比例',
           left: 10,
           top: 5,
           textStyle: {
@@ -57,7 +57,7 @@ export default {
         },
         series: [
           {
-            name: '支付方式统计(金额)',
+            name: '订单状态比例',
             type: 'pie',
             radius: '55%',
             center: ['50%', '50%'],

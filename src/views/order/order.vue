@@ -53,12 +53,11 @@
       </el-table-column>
       <el-table-column align="center" sortable prop="gmtModified" label="修改时间" width="220">
       </el-table-column>
-<!--      <el-table-column label="操作" min-width="300">-->
-<!--        <template slot-scope="scope">-->
-<!--          <el-button size="mini" @click="handleEdit(scope.row)">编辑</el-button>-->
-<!--          <el-button size="mini" type="danger" @click="deleteProduct(scope.row.id)">删除</el-button>-->
-<!--        </template>-->
-<!--      </el-table-column>-->
+      <el-table-column label="操作" min-width="150">
+        <template slot-scope="scope">
+          <el-button size="mini" @click="send(scope.row)" v-show="scope.row.status === 20">发货</el-button>
+        </template>
+      </el-table-column>
     </el-table>
 
     <el-dialog title="订单详情" :visible.sync="dialogTableVisible">
@@ -107,6 +106,17 @@ export default {
   },
   /* 定义事件函数 */
   methods: {
+    send(order){
+      this.$axios.put(`order/send/${order.orderNo}`).then(res => {
+        if(res.data.code === 200){
+          this.$message.success("发货成功");
+          this.queryAll()
+        }
+        else{
+          this.$message.error(res.data.message)
+        }
+      })
+    },
     showOrderItem(orderItemList) {
       this.orderItemList = orderItemList
       this.dialogTableVisible = true
