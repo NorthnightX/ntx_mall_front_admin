@@ -50,8 +50,6 @@ axios.interceptors.response.use(
     return response;
   }
 );
-
-
 /* eslint-disable no-new */
 new Vue({
     el: '#app',

@@ -28,17 +28,6 @@
         <el-button size="small" type="primary" icon="el-icon-circle-plus" @click="addProduct()">添加商品</el-button>
       </el-form-item>
     </el-form>
-    <!--列表删除-->
-    <el-form v-show="showDeleteButton" :inline="true" :model="formInline" class="user-search">
-      <el-form-item>
-        <el-button size="small" type="primary" icon="el-icon-close" @click="closeDeleteButton()">取消</el-button>
-      </el-form-item>
-      <el-form-item>
-        <el-button size="small" type="danger" icon="el-icon-delete" style="margin-left: 1000px"
-                   @click="deleteList(ids)">删除
-        </el-button>
-      </el-form-item>
-    </el-form>
     <!--列表-->
     <el-table size="small" @selection-change="selectChange" :data="productData" highlight-current-row
               border element-loading-text="拼命加载中" style="width: 100%;">
