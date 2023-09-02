@@ -11,7 +11,7 @@
         <el-select size="small" v-model="formInline.categoryId" placeholder="请选择所属分类">
           <el-option label="全部" value=""></el-option>
           <el-option
-            v-for="item in this.cateGoryList"
+            v-for="item in this.cateGoryInitialList"
             :key="item.id"
             :label="item.name"
             :value="item.id"
@@ -64,8 +64,10 @@
       <el-table-column align="center" prop="detail" label="详情" width="220">
         <template slot-scope="scope">
           <div>
-              <el-button slot="reference" type="text"
-                         style="color: gray;font-size: 13px" @click="showDetail(scope.row.detail)">{{ scope.row.detail.slice(0, 20) + '...' }}</el-button>
+            <el-button slot="reference" type="text"
+                       style="color: gray;font-size: 13px" @click="showDetail(scope.row.detail)">
+              {{ scope.row.detail.slice(0, 20) + '...' }}
+            </el-button>
           </div>
         </template>
       </el-table-column>
@@ -98,7 +100,7 @@
       <div v-html="dialogContent"></div>
     </el-dialog>
     <!-- 修改商品信息 -->
-    <el-dialog :title="title" :visible.sync="editFormVisible" width="80%" @click='closeDialog("edit")'>
+    <el-dialog :title="title" :visible.sync="editFormVisible" width="80%" @close='closeDialog("edit")'>
       <el-form label-width="100px" ref="editProductForm" :model="editProductForm" :rules="rules">
         <el-form-item label="商品名" prop="name">
           <el-input size="small" v-model="editProductForm.name" auto-complete="off"
@@ -121,9 +123,17 @@
           </el-dialog>
         </el-form-item>
         <el-form-item label="所属分类" prop="categoryId">
-          <el-select size="small" v-model="editProductForm.categoryId" placeholder="请选择">
+          <el-select size="small" v-model="initialCategoryId" @change="queryChildCategory()" placeholder="请选择">
             <el-option
-              v-for="item in this.cateGoryList"
+              v-for="item in this.cateGoryInitialList"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+          <el-select size="small" :disabled="categoryDisable" v-model="editProductForm.categoryId" placeholder="请选择">
+            <el-option
+              v-for="item in this.cateGoryChildList"
               :key="item.id"
               :label="item.name"
               :value="item.id"
@@ -157,13 +167,13 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button size="small" @click='closeDialog("edit")'>取消</el-button>
-        <el-button size="small" type="primary"  class="title" @click="submitForm('editProductForm')">
+        <el-button size="small" type="primary" class="title" @click="submitForm('editProductForm')">
           保存
         </el-button>
       </div>
     </el-dialog>
     <!--    新增商品-->
-    <el-dialog :title="title1" :visible.sync="addFormVisible" width="80%" @click='closeDialog("edit")'>
+    <el-dialog :title="title1" :visible.sync="addFormVisible" width="80%" @close='closeDialog("edit")'>
       <el-form label-width="120px" ref="editProductForm" :model="editAddProductForm" :rules="rules">
         <el-form-item label="商品名" prop="name">
           <el-input size="small" v-model="editAddProductForm.name" auto-complete="off"
@@ -186,9 +196,18 @@
           </el-dialog>
         </el-form-item>
         <el-form-item label="所属分类" prop="categoryId">
-          <el-select size="small" v-model="editAddProductForm.categoryId" placeholder="请选择">
+          <el-select size="small" v-model="initialCategoryId" @change="queryChildCategory()" placeholder="请选择">
             <el-option
-              v-for="item in this.cateGoryList"
+              v-for="item in this.cateGoryInitialList"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+          <el-select size="small" v-model="editAddProductForm.categoryId" :disabled="categoryDisable"
+                     placeholder="请选择">
+            <el-option
+              v-for="item in this.cateGoryChildList"
               :key="item.id"
               :label="item.name"
               :value="item.id"
@@ -243,10 +262,12 @@ export default {
   data() {
     /* 定义初始化变量 */
     return {
+      initialCategoryId: '',
+      categoryDisable: true,
       dialogContent: '',
-      uploadImagesList:[],
-      subImageList:[],
-      headers:  {
+      uploadImagesList: [],
+      subImageList: [],
+      headers: {
         'authorization': localStorage.getItem('token'),
         // 'Content-Type': 'multipart/form-data'
       },
@@ -270,7 +291,7 @@ export default {
       },
       editAddProductForm: {
         name: '',
-        subImages:'',
+        subImages: '',
         categoryId: '',
         subtitle: '',
         detail: '',
@@ -320,10 +341,11 @@ export default {
           {required: true, message: '请输入商品副标题', trigger: 'blur'}
         ]
       },
-      cateGoryList: [],
+      cateGoryInitialList: [],
+      cateGoryChildList: [],
       editProductForm: {
         id: '',
-        subImages:'',
+        subImages: '',
         status: '',
         name: '',
         categoryId: '',
@@ -340,7 +362,15 @@ export default {
   },
   /* 定义事件函数 */
   methods: {
-    showDetail(content){
+    queryChildCategory() {
+      this.$axios.get('/category/queryChildCategory', {params: {id: this.initialCategoryId}}).then(res => {
+        this.editAddProductForm.categoryId = ''
+        this.editProductForm.categoryId = ''
+        this.cateGoryChildList = res.data.data
+        this.categoryDisable = false
+      })
+    },
+    showDetail(content) {
       this.dialogVisible = true;
       this.dialogContent = content;
     },
@@ -376,13 +406,24 @@ export default {
       this.$axios.post("/product/addProduct", this.editAddProductForm).then(res => {
         if (res.data.code === 200) {
           this.addFormVisible = false
-          this.editAddProductForm = {}
+          this.categoryDisable = true
           this.queryAll()
+          this.cleanAddForm()
           this.$message.success("新增成功")
         } else {
           this.$message.error(res.data.message)
         }
       })
+    },
+    cleanAddForm() {
+      this.editAddProductForm.name = ''
+      this.editAddProductForm.subImages = ''
+      this.editAddProductForm.categoryId = ''
+      this.editAddProductForm.subtitle = ''
+      this.editAddProductForm.detail = ''
+      this.editAddProductForm.price = ''
+      this.editAddProductForm.stock = ''
+      this.initialCategoryId = ''
     },
     addProduct() {
       this.addFormVisible = true
@@ -416,12 +457,19 @@ export default {
         }
       })
     },
+    allCategory(){
+      this.$axios.get('/category/queryAllCategory').then(res => {
+        this.editAddProductForm.categoryId = ''
+        this.cateGoryChildList = res.data.data
+      })
+    },
     handleEdit(product) {
       this.editFormVisible = true
       this.subImageList = JSON.parse(product.subImages).map(imageUrl => ({
         name: 'subImage',
         url: imageUrl,
       }));
+      this.allCategory()
       this.uploadImagesList = JSON.parse(product.subImages)
       this.editProductForm = {...product}
     },
@@ -452,11 +500,11 @@ export default {
     closeDialog() {
       this.editFormVisible = false
       this.addFormVisible = false
-      this.subImageList=[]
-      this.dialogImageUrl=''
-      this.uploadImagesList=[]
-      this.editAddProductForm = {}
-      this.editProductForm = {}
+      this.categoryDisable = true
+      this.subImageList = []
+      this.dialogImageUrl = ''
+      this.uploadImagesList = []
+      this.cleanAddForm()
     },
     editStatus(row) {
       this.editForm.id = row.id
@@ -487,9 +535,9 @@ export default {
       this.pageNum = 1
       this.queryAll()
     },
-    queryAllCategory() {
-      this.$axios.get('/category/queryAllCategory').then(res => {
-        this.cateGoryList = res.data.data
+    queryAllInitialCategory() {
+      this.$axios.get('/category/queryInitialCategory').then(res => {
+        this.cateGoryInitialList = res.data.data
       })
     },
     queryAll() {
@@ -504,9 +552,9 @@ export default {
         this.productData = res.data.data.records
         this.pageNum = res.data.data.current
         this.total = res.data.data.total
-        this.subImageList=[]
-        this.dialogImageUrl=''
-        this.uploadImagesList=[]
+        this.subImageList = []
+        this.dialogImageUrl = ''
+        this.uploadImagesList = []
 
       })
     }
@@ -516,7 +564,7 @@ export default {
   */
   created() {
     this.queryAll()
-    this.queryAllCategory()
+    this.queryAllInitialCategory()
   }
 }
 </script>
