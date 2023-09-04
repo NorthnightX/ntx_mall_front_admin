@@ -245,7 +245,7 @@
 </template>
 
 <script>
-
+import MarkdownIt from 'markdown-it';
 export default {
   name: "agent",
   data() {
@@ -351,6 +351,10 @@ export default {
   },
   /* 定义事件函数 */
   methods: {
+    renderMarkdown(content) {
+      const md = new MarkdownIt();
+      return md.render(content);
+    },
     queryChildCategory() {
       this.$axios.get('/category/queryChildCategory', {params: {id: this.initialCategoryId}}).then(res => {
         this.editAddProductForm.categoryId = ''
@@ -361,7 +365,8 @@ export default {
     },
     showDetail(content) {
       this.dialogVisible = true;
-      this.dialogContent = content;
+      // this.dialogContent = content;
+      this.dialogContent = this.renderMarkdown(content);
     },
     handleUploadSuccess(response, file, fileList) {
       const uploadedImageUrl = response.data;
